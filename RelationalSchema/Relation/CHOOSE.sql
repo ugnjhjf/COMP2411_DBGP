@@ -1,0 +1,11 @@
+CREATE TABLE CHOOSE
+(
+    UserID   NUMBER(4),
+    ProductID NUMBER(4),
+    CONSTRAINT FK_CHOOSE_USER
+        FOREIGN KEY (UserID)
+        REFERENCES Customer(UserID),
+    CONSTRAINT FK_CHOOSE_PRODUCT
+    FOREIGN KEY (ProductID)
+        REFERENCES Product(ProductID)
+);

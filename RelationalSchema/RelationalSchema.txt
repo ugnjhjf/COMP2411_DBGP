@@ -1,0 +1,23 @@
+RELATIONAL SCHEMA
+Entity:
+User(UserID(NUMBER 4) , Username(20) , Account_password(20)
+// User change to Customer
+
+Cart(UserID , ProductID(20) , Quantity)
+Product(ProductID(Number 4) , Specification(VARCHAR 50) , Description(VARCHAR 50) , SellerID(FK NUMBER 4))
+Seller(SellerID (4), SellerName(10))
+Review(ReviewID , ProductID(FK) ,UserID(FK) , UserComment(VARCHAR 50))
+Parcel(ParcelID , ProductID(FK) , UserID(FK) , [Quantity(FK)](Deleted) , Shipping_address (VARCHAR 100))
+Centre(CentreID , Address)
+
+
+
+Relation:
+Select(UserID(FK) , ProductID(FK))
+//Select change to choose
+
+Browse(UserID(FK) , ProductID(FK))
+Sell(SellerID(FK) , ProductID(FK))
+Comment(ReviewID(FK) , ProductID(FK))
+Checkout(UserID(FK) , ProductID(FK) , ParcelID(FK))
+Shipment(ParcelID(FK) , CentreID(FK))
