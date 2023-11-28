@@ -2,7 +2,7 @@ CREATE TABLE PARCEL
 (
     ParcelID   NUMBER(4) PRIMARY KEY,
     ProductID  NUMBER(4),
-    Quantity NUMBERS(4),
+    Quantity NUMBER(4),
     UserID NUMBER(4) NOT NULL,
     Shipping_address VARCHAR(100),
     CONSTRAINT FK_PARCEL_PRODUCT FOREIGN KEY (ProductID) REFERENCES PRODUCT(ProductID),
