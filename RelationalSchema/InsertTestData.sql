@@ -38,7 +38,7 @@ select * from PARCEL;
 
 commit;
 
--- UserID  NUMBER(4) PRIMARY KEY,
+-- UserID  NUMBER(4) PRIMARY KE Y,
 --     ProductID  NUMBER(4),
 --     Quantity NUMBER(4),
 INSERT INTO CART (UserID, ProductID, Quantity) VALUES (1001,0001,1);
