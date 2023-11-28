@@ -53,8 +53,18 @@ public class AdminPanel {
                 case "7":
                     addUser();
                     break;
+                default:
+                    inputStatus=false;
+                    break;
             }
         }
+    }
+    static void clearScreen() throws IOException, InterruptedException
+    {
+        if (System.getProperty("os.name").contains("Windows"))
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        else
+            System.out.print("\033[H\033[2J");
     }
     static void addItem() throws SQLException {
         Console console = System.console();
@@ -71,18 +81,6 @@ public class AdminPanel {
         String descript = console.readLine();
         System.out.println("Enter SellerID: ");
         int sellerID = Integer.parseInt(console.readLine());
-
-//        CREATE TABLE PRODUCT
-//                (
-//                        ProductID    NUMBER(4) PRIMARY KEY,
-//                        ProductName  VARCHAR(50),
-//                        Price Number(4),
-//                        Specification  VARCHAR(50),
-//                        Description  VARCHAR(50),
-//                        SellerID NUMBER(4),
-//                        CONSTRAINT FK_PRODUCT_SELLER
-//                        FOREIGN KEY (SellerID)
-//                        REFERENCES SELLER(SellerID)
 
         String insertQuery = "INSERT INTO PRODUCT(ProductID,ProductName,Price,Specification,Description,SellerID) VALUES (?, ?, ?, ?, ?, ?)";
 

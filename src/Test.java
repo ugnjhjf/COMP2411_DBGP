@@ -61,7 +61,7 @@ public class Test
         customerList = st1.executeQuery("SELECT * FROM CUSTOMER");
         customerList.next();
         while (customerList.next()) {
-            System.out.println(customerList.getString(1) + " " + customerList.getString(2)+
+            System.out.println(customerList.getString(1) + "     " + customerList.getString(2)+
                     " " + customerList.getString(3));
         }
         st1.executeUpdate("INSERT INTO CUSTOMER (UserID, Username, Password) VALUES (1500,'Echidna','passwd')");
