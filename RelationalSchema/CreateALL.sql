@@ -6,7 +6,6 @@ SELECT table_name FROM user_tables;
 
 @/home/22084045d/DBGP/Entity/SELLER.sql
 
-@/home/22084045d/DBGP/Entity/CENTRE.sql
 
 @/home/22084045d/DBGP/Entity/PRODUCT.sql
 
@@ -16,7 +15,6 @@ SELECT table_name FROM user_tables;
 
 SELECT table_name FROM user_tables;
 
-@/home/22084045d/DBGP/Relation/BROWSE.sql
 
 @/home/22084045d/DBGP/Relation/CHECKOUT.sql
 
@@ -24,8 +22,7 @@ SELECT table_name FROM user_tables;
 
 @/home/22084045d/DBGP/Relation/SELL.sql
 
-@/home/22084045d/DBGP/Relation/SHIPMENT.sql
-
 @/home/22084045d/DBGP/Relation/USERCOMMENT.sql
+
 
 SELECT table_name FROM user_tables;

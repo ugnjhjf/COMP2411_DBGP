@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Application/Application.iml" filepath="$PROJECT_DIR$/Application/Application.iml" />
       <module fileurl="file://$PROJECT_DIR$/COMP2411_DBGP.iml" filepath="$PROJECT_DIR$/COMP2411_DBGP.iml" />
       <module fileurl="file://$PROJECT_DIR$/RelationalSchema/RelationalSchema.iml" filepath="$PROJECT_DIR$/RelationalSchema/RelationalSchema.iml" />
     </modules>

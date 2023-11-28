@@ -21,14 +21,12 @@ public class employee
         System.out.print("Enter your password: ");    // Password of your Oracle Account
         char[] password = console.readPassword();
 		String pwd = String.valueOf(password);
-
 		// Connection
 		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 		OracleConnection conn = 
 			(OracleConnection)DriverManager.getConnection(
 			 "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms",username,pwd);
-		clearScreen();	
-
+		clearScreen();
 		// Prepare employee list
 		Statement stmt;
 		ResultSet rset;
@@ -38,6 +36,7 @@ public class employee
 		// Prepare SQL for request
 		PreparedStatement prepareQuery = conn.prepareStatement(
 			"SELECT ENO, ENAME, ZIP, HDATE FROM EMPLOYEES WHERE ENO = ?");
+
 			
 		while (enumber != -1)
 		{

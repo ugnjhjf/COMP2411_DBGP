@@ -1,5 +1,0 @@
-CREATE TABLE CENTRE
-(
-    CentreID  NUMBER(4) PRIMARY KEY,
-    Address   VARCHAR(30)
-);

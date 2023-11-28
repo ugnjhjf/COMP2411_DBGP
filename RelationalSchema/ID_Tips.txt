@@ -1,0 +1,5 @@
+0xxx : Product ID
+1xxx : User ID
+3xxx : Seller ID
+5xxx : Parcel ID
+7xxx : Comment ID
