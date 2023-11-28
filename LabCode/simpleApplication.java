@@ -20,7 +20,7 @@ public class simpleApplication
 		OracleConnection conn = 
 			(OracleConnection)DriverManager.getConnection(
 				"jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms",username,pwd);
-		
+		 stmt = conn.cre
 		Statement stmt = conn.createStatement();
 		ResultSet rset = stmt.executeQuery("SELECT EMPNO, ENAME, JOB FROM EMP");
 		while (rset.next())
