@@ -38,6 +38,7 @@ public class employee
 		// Prepare SQL for request
 		PreparedStatement prepareQuery = conn.prepareStatement(
 			"SELECT ENO, ENAME, ZIP, HDATE FROM EMPLOYEES WHERE ENO = ?");
+
 			
 		while (enumber != -1)
 		{
