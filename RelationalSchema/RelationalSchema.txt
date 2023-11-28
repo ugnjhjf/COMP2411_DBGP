@@ -4,7 +4,7 @@ User(UserID(NUMBER 4) , Username(20) , Account_password(20)
 // User change to Customer
 
 Cart(UserID , ProductID(20) , Quantity)
-Product(ProductID(Number 4) , Specification(VARCHAR 50) , Description(VARCHAR 50) , SellerID(FK NUMBER 4))
+Product(ProductID(Number 4) , Price (Number 4), Specification(VARCHAR 50) , Description(VARCHAR 50) , SellerID(FK NUMBER 4))
 Seller(SellerID (4), SellerName(10))
 Review(ReviewID , ProductID(FK) ,UserID(FK) , UserComment(VARCHAR 50))
 Parcel(ParcelID , ProductID(FK) , UserID(FK) , [Quantity(FK)](Deleted) , Shipping_address (VARCHAR 100))
