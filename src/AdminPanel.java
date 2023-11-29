@@ -149,7 +149,7 @@ public class AdminPanel {
      }*/
     public static void searchByID() throws SQLException, IOException, InterruptedException {
         Console console= System.console();
-        System.out.print("Input the product ID: ");
+        System.out.print("Input the product ID (begin with 0XXX): ");
         int productID = Integer.parseInt(console.readLine());
         Statement st1 = conx.createStatement();
 
@@ -163,36 +163,37 @@ public class AdminPanel {
             System.out.println("Product specification: "+productList.getString(4));
             System.out.println("Product description: "+productList.getString(5));
             System.out.println("Product Seller ID: "+productList.getInt(6));
+            Thread.sleep(2000);
         }else{
             System.out.println("\nSorry, product is not founded!");
-            Thread.sleep(1500);
+            Thread.sleep(2500);
+            clearScreen();
         }
-//        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product ID", "Product Name", "Product Price", "Product Specification","Product Description","Seller");
-//        System.out.println("===========================================================================================================================================");
-//        while (productList.next()) {
-//            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getString(2),
-//                    productList.getString(3), productList.getString(4));
-//        }
         st1.close(); // .close = commit
     }
 
     //showParcel还在建设当中
     static void showAParcel() throws SQLException, IOException, InterruptedException {
         Console console= System.console();
-        System.out.print("Input the parcel ID: ");
+        System.out.print("Input the parcel ID (begin with 5XXX): ");
         int parcelID = Integer.parseInt(console.readLine());
         Statement st1 = conx.createStatement();
 
-//        clearScreen();
-
         ResultSet productList = st1.executeQuery("SELECT * FROM PARCEL WHERE ParcelID="+parcelID);
-        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product ID", "Product Name", "Product Price", "Product Specification","Product Description","Seller");
-        System.out.println("===========================================================================================================================================");
-//        while (productList.next()) {
-//            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getString(2),
-//                    productList.getString(3), productList.getString(4));
-//        }
-        st1.close(); // .close = commit
+        if(productList.next()){
+            System.out.println("\nParcel founded! Details of the parcel is shown below.\n");
+            System.out.println("Parcel ID: "+productList.getInt(1));
+            System.out.println("Product ID: "+productList.getInt(2));
+            System.out.println("Quantity: "+productList.getInt(3));
+            System.out.println("User ID: "+productList.getInt(4));
+            System.out.println("Shipping address: "+productList.getString(5));
+            Thread.sleep(2000);
+        }else{
+            System.out.println("\nSorry, this parcel is not founded!");
+            Thread.sleep(2500);
+            clearScreen();
+        }
+        st1.close();
     }
 
     static void showAllItem() throws SQLException, IOException, InterruptedException {
