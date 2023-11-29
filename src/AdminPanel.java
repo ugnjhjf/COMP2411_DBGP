@@ -57,14 +57,14 @@ public class AdminPanel {
                 case "3":
                     showAllItem();
                     break;
-                case "4": //要修
+                case "4":
                     searchByID();
                     break;
-                case "5": //也要修
+                case "5":
                     showAParcel();
                     break;
                 case "6"://待实现
-
+                    analyzeSales();
                     break;
                 case "7":
                     addUser();
@@ -91,6 +91,11 @@ public class AdminPanel {
         Console console = System.console();
 
         System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
+        try{
+            int productID = Integer.parseInt(console.readLine());
+        }catch (Exception e){
+            System.out.println("Invalid ProductID input, input again!");
+        }
         int productID = Integer.parseInt(console.readLine());
         System.out.print("Enter ProductName: ");
         String productName = console.readLine();
@@ -199,6 +204,7 @@ public class AdminPanel {
     static void showAllItem() throws SQLException, IOException, InterruptedException {
         clearScreen();
         System.out.println("\nProducts in stock are shown below: ");
+        System.out.println("Products ID, Product Name, Product Price, Product specification, Product description, Seller ID");
         Statement st1;
         st1 = conx.createStatement();
         ResultSet rs;

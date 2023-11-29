@@ -9,7 +9,8 @@ public class UserPanel {
     static OracleConnection conx;
     static int userID;
     private static boolean loginStatus = false;
-    private static boolean loginOrcale = false;
+    private static boolean loginOracle = false;
+//    private static
 
     public static void main(String[] args) throws SQLException, IOException, InterruptedException {
 
