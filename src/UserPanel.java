@@ -22,14 +22,14 @@ public class UserPanel {
 
             char[] password = console.readPassword();
             String pwd = String.valueOf(password);
-            try {
+//            try {
                 DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
                 conn = (OracleConnection) DriverManager.getConnection(
                         "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms", username, pwd);
                 loginOrcale = true;
-            } catch (Exception e) {
-                System.out.println("login failed. Try again");
-            }
+//            } catch (Exception e) {
+//                System.out.println("login failed. Try again");
+//            }
         }
 
         conx = conn;
@@ -69,7 +69,8 @@ public class UserPanel {
                     shoppingCart();
                     break;
                 case 3:
-
+                    checkParcel();
+                    break;
                 case 4:
                 case 5:
                 case 6:
@@ -291,5 +292,27 @@ public class UserPanel {
             System.out.println("Invalid input. Check the id exist");
         }
     }
+    private static void checkParcel() throws SQLException, IOException, InterruptedException {
+        ResultSet productList;
 
+
+        clearScreen();
+        try {
+            Statement st1 = conx.createStatement();
+            productList = st1.executeQuery("SELECT PRODUCT.productName,PARCEL.Quantity,PARCEL.Shipping_address FROM PARCEL where UserID = " + UserPanel.userID + "" + "AND PRODUCT.ProductID = PARCEL.ProductID");
+            System.out.printf("%-15s %-10s %-15s %n", "Product Name", "Quantity", "Shipping address");
+            System.out.println("==============================================================================================");
+            while (productList.next()) {
+                System.out.printf("%-15s %-10s %-15s %n", productList.getString(1), productList.getString(2),
+                        productList.getString(3));
+
+                st1.close(); // .close = commit
+
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println("Something wrong in checkParcel(). Note to admin");
+        }
+    }
 }
