@@ -9,26 +9,33 @@ public class UserPanel {
     private static OracleConnection conx;
     private static int userID;
     private static boolean loginStatus = false;
+    private static boolean loginOrcale = false;
 
     public static void main(String[] args) throws SQLException, IOException, InterruptedException {
         Console console = System.console();
-        System.out.print("Enter your DBMS username: ");    // Your Oracle ID with double quote
-        String username = console.readLine();         // e.g. "98765432d"
-        System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
+        OracleConnection conn = null;
+        while (!(loginOrcale)) { //Login Orcale
 
-        char[] password = console.readPassword();
-        String pwd = String.valueOf(password);
-        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-        OracleConnection conn =
-                (OracleConnection) DriverManager.getConnection(
+            System.out.print("Enter your DBMS username: ");    // Your Oracle ID with double quote
+            String username = console.readLine();         // e.g. "98765432d"
+            System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
+
+            char[] password = console.readPassword();
+            String pwd = String.valueOf(password);
+            try {
+                DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+                conn = (OracleConnection) DriverManager.getConnection(
                         "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms", username, pwd);
-
+                loginOrcale = true;
+            } catch (Exception e) {
+                System.out.println("login failed. Try again");
+            }
+        }
 
         conx = conn;
         clearScreen();
         System.out.println("Database Login successfully");
         System.out.println(" ");
-
 
         while (!(loginStatus)) { //Login user account (OSS)
             System.out.println("Please login your account to continue - Metaverse Online Shopping System");
@@ -36,7 +43,7 @@ public class UserPanel {
             String InputUserName = console.readLine();
             System.out.print("Input your password: ");
             String InputUserPwd = console.readLine();
-            loginStatus=loginCheck(InputUserName,InputUserPwd);
+            loginStatus = loginCheck(InputUserName, InputUserPwd);
         }
 
         clearScreen();
@@ -130,10 +137,39 @@ public class UserPanel {
     }
 
     public static void shoppingCart() throws SQLException, IOException, InterruptedException{
-        System.out.println("4. Add product");
-//        case 4:
-        addProduct();
+        System.out.println("");
+        System.out.println("1. List all products in shopping cart");
+        System.out.println("2. Add product");
+        System.out.println("3. Delete product");
+        System.out.print("Input the number option: ");
+        Scanner scanner = new Scanner(System.in);
+        int input = scanner.nextInt();
 
+        switch (input) {
+            case 1:
+                listAllProductInCart();
+                break;
+            case 2:
+                listAllProductInCart();
+                addProductToCart();
+                break;
+            case 3:
+                listAllProductInCart();
+                deleteProductInCart();
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private static void deleteProductInCart() {
+    }
+
+    private static void addProductToCart() {
+    }
+
+    private static void listAllProductInCart() {
     }
 
     public static void searchByName() throws SQLException, IOException, InterruptedException {
@@ -158,21 +194,27 @@ public class UserPanel {
     public static void searchByID() throws SQLException, IOException, InterruptedException {
         Console console= System.console();
         System.out.print("Input the product id: ");
-        int productID = Integer.parseInt(console.readLine());
 
-        ResultSet productList;
-        Statement st1 = conx.createStatement();
+        try {
+            int productID = Integer.parseInt(console.readLine());
+            ResultSet productList;
+            Statement st1 = conx.createStatement();
 
-        clearScreen();
+            clearScreen();
 
-        productList = st1.executeQuery("SELECT * FROM PRODUCT where ProductID="+ productID );
-        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product Name", "Product ID", "Product Price", "Product Quantity");
-        System.out.println("==============================================================================================");
-        while (productList.next()) {
-            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getString(2),
-                    productList.getString(3), productList.getString(4));
+            productList = st1.executeQuery("SELECT * FROM PRODUCT where ProductID=" + productID);
+            System.out.printf("%-15s %-10s %-15s %-17s%n", "Product Name", "Product ID", "Product Price", "Product Quantity");
+            System.out.println("==============================================================================================");
+            while (productList.next()) {
+                System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getString(2),
+                        productList.getString(3), productList.getString(4));
+                st1.close(); // .close = commit
+            }
         }
-        st1.close(); // .close = commit
+        catch(Exception e){
+            clearScreen();
+            System.out.println("Invalid input. Try again");
+        }
     }
 
     public static void listAllProduct() throws SQLException, IOException, InterruptedException {
@@ -196,21 +238,26 @@ public class UserPanel {
         Console console = System.console();
 
         System.out.print("Enter ProductID: ");
-        int productID = Integer.parseInt(console.readLine());
+        try {
+            int productID = Integer.parseInt(console.readLine());
 
-        System.out.print("Enter Quantity: ");
-        int quantity = Integer.parseInt(console.readLine());
-        String insertQuery = "INSERT INTO CART(UserID,ProductID,Quantity) VALUES (?, ?, ?)";
+            System.out.print("Enter Quantity: ");
+            int quantity = Integer.parseInt(console.readLine());
+            String insertQuery = "INSERT INTO CART(UserID,ProductID,Quantity) VALUES (?, ?, ?)";
 
-        PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
-        preparedStatement.setInt(1, UserPanel.userID);
-        preparedStatement.setInt(2, productID);
-        preparedStatement.setInt(3, quantity);
+            PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
+            preparedStatement.setInt(1, UserPanel.userID);
+            preparedStatement.setInt(2, productID);
+            preparedStatement.setInt(3, quantity);
+            System.out.println();
 
-
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
-        System.out.println("Product Added!");
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            System.out.println("Product Added!");
+        }catch (Exception e)
+        {
+            System.out.println("Invalid input. Check the id exist");
+        }
     }
 
 }
