@@ -126,7 +126,7 @@ public class AdminPanel {
     }
     static void deleteItem() throws SQLException, IOException, InterruptedException {
         Console console = System.console();
-        System.out.print("Enter ProductID (4 numbers only, begin with 1XXX): ");
+        System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
         int productID = Integer.parseInt(console.readLine());
 
         String deleteQuery = "DELETE FROM PRODUCT WHERE ProductID=?";
@@ -148,33 +148,51 @@ public class AdminPanel {
          ps.close();
      }*/
     public static void searchByID() throws SQLException, IOException, InterruptedException {
-        clearScreen();
         Console console= System.console();
         System.out.print("Input the product ID: ");
         int productID = Integer.parseInt(console.readLine());
         Statement st1 = conx.createStatement();
 
-//        clearScreen();
 
         ResultSet productList = st1.executeQuery("SELECT * FROM PRODUCT WHERE ProductID="+productID);
-        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product Name", "Product ID", "Product Price", "Product Quantity");
-        System.out.println("==============================================================================================");
-        while (productList.next()) {
-            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getString(2),
-                    productList.getString(3), productList.getString(4));
+        if(productList.next()){
+            System.out.println("\nProduct founded! Details of "+productList.getString(2)+" is shown below.\n");
+            System.out.println("ProductID: "+productList.getInt(1));
+            System.out.println("Product name: "+productList.getString(2));
+            System.out.println("Product price: "+productList.getInt(3));
+            System.out.println("Product specification: "+productList.getString(4));
+            System.out.println("Product description: "+productList.getString(5));
+            System.out.println("Product Seller ID: "+productList.getInt(6));
+        }else{
+            System.out.println("\nSorry, product is not founded!");
+            Thread.sleep(1500);
         }
+//        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product ID", "Product Name", "Product Price", "Product Specification","Product Description","Seller");
+//        System.out.println("===========================================================================================================================================");
+//        while (productList.next()) {
+//            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getString(2),
+//                    productList.getString(3), productList.getString(4));
+//        }
         st1.close(); // .close = commit
     }
+
+    //showParcel还在建设当中
     static void showAParcel() throws SQLException, IOException, InterruptedException {
-        clearScreen();
-        Console console = System.console();
-        System.out.print("Enter ParcelID: ");
-        int parID = Integer.parseInt(console.readLine());
-        String locQ="SELECT * FROM PARCEL WHERE ParcelID=?";
-        PreparedStatement ps=conx.prepareStatement(locQ);
-        ps.setInt(1,parID);
-        ps.executeQuery();
-        ps.close();
+        Console console= System.console();
+        System.out.print("Input the parcel ID: ");
+        int parcelID = Integer.parseInt(console.readLine());
+        Statement st1 = conx.createStatement();
+
+//        clearScreen();
+
+        ResultSet productList = st1.executeQuery("SELECT * FROM PARCEL WHERE ParcelID="+parcelID);
+        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product ID", "Product Name", "Product Price", "Product Specification","Product Description","Seller");
+        System.out.println("===========================================================================================================================================");
+//        while (productList.next()) {
+//            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getString(2),
+//                    productList.getString(3), productList.getString(4));
+//        }
+        st1.close(); // .close = commit
     }
 
     static void showAllItem() throws SQLException, IOException, InterruptedException {

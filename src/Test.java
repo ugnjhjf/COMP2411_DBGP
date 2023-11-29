@@ -34,6 +34,7 @@ public class Test
 //        executeUpdate()方法执行INSERT、UPDATE、DELETE等语句,返回影响的行数
 //        close()方法关闭Statement对象
 //        getXxx()和setXxx()方法用于获取和设置Statement属性,如最大行数、超时时间等*/
+
 //        Java中的ResultSet接口用于表示数据库查询操作的结果集。它的主要功能和方法包括:
 //        用来封装SELECT语句执行后的结果集数据
 //        next()方法移动指针到下一行,判断是否有更多行
