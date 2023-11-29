@@ -396,6 +396,25 @@ public class UserPanel {
     }
 
     private static void changeTel() {
+        Console console = System.console();
+
+        System.out.print("Enter telephone: ");
+        try {
+            String telphone = console.readLine();
+
+            String insertQuery = "UPDATE CUSTOMER SET Tel = ? WHERE UserID = ? ";
+
+            PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
+            preparedStatement.setString(1, telphone);
+            preparedStatement.setInt(2, UserPanel.userID);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            System.out.println("Password Update!");
+        }catch (Exception e)
+        {
+            System.out.println("Invalid input. Check the input and try again.");
+        }
+
     }
 
     private static void changePassword() {
