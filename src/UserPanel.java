@@ -69,6 +69,7 @@ public class UserPanel {
                     shoppingCart();
                     break;
                 case 3:
+
                 case 4:
                 case 5:
                 case 6:
@@ -151,7 +152,7 @@ public class UserPanel {
                 break;
             case 2:
                 listAllProductInCart();
-                addProductToCart();
+                addProduct();
                 break;
             case 3:
                 listAllProductInCart();
@@ -164,12 +165,43 @@ public class UserPanel {
     }
 
     private static void deleteProductInCart() {
+        Console console = System.console();
+
+        System.out.print("Enter ProductID: ");
+        try {
+            int productID = Integer.parseInt(console.readLine());
+
+            String insertQuery = "DELETE FROM CART WHERE USER_ID = ? AND PRODUCT_ID = ? ";
+            
+            PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
+            preparedStatement.setInt(1, UserPanel.userID);
+            preparedStatement.setInt(2, productID);
+            System.out.println();
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            System.out.println("Product delete!");
+        }catch (Exception e)
+        {
+            System.out.println("Invalid input. Check the id exist");
+        }
     }
 
-    private static void addProductToCart() {
-    }
 
-    private static void listAllProductInCart() {
+    private static void listAllProductInCart() throws SQLException, IOException, InterruptedException {
+        ResultSet productList;
+        Statement st1 = conx.createStatement();
+
+        clearScreen();
+
+        productList = st1.executeQuery("SELECT * FROM CART where UserID = '" + UserPanel.userID + "'");
+        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product Name", "Product ID", "Product Price", "Product Quantity");
+        System.out.println("==============================================================================================");
+        while (productList.next()) {
+            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getString(2),
+                    productList.getString(3), productList.getString(4));
+        }
+        st1.close(); // .close = commit
     }
 
     public static void searchByName() throws SQLException, IOException, InterruptedException {
