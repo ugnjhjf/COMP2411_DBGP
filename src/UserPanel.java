@@ -16,10 +16,10 @@ public class UserPanel {
         
         Console console = System.console();
         OracleConnection conn = null;
-        while (!(loginOrcale)) { //Login Orcale
+        while (!(loginOracle)) { //Login Orcale
 
             System.out.print("Enter your DBMS username: 22084045d");    // Your Oracle ID with double quote
-            String username = console.readLine();         // e.g. "98765432d"
+            String username = console.readLine();         // e.g. "98765432d"     String username = console.readLine();         // e.g. "98765432d"
             System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
 
             char[] password = console.readPassword();
@@ -28,7 +28,7 @@ public class UserPanel {
                 DriverManager.registerDriver(new OracleDriver());
                 conn = (OracleConnection) DriverManager.getConnection(
                         "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms", username, pwd);
-                loginOrcale = true;
+                loginOracle = true;
 //            } catch (Exception e) {
 //                System.out.println("login failed. Try again");
 //            }
@@ -43,7 +43,9 @@ public class UserPanel {
             System.out.println("Please login your account to continue - Metaverse Online Shopping System");
             System.out.print("Input your username: ");
             String InputUserName = console.readLine();
+//            String InputUserName = "Jones1";
             System.out.print("Input your password: ");
+//            String InputUserPwd = "pass2";
             String InputUserPwd = console.readLine();
             loginStatus = loginCheck(InputUserName, InputUserPwd);
         }
@@ -75,6 +77,7 @@ public class UserPanel {
                     break;
                 case 4:
                     accountManagement();
+                    break;
                 case 5:
                 case 6:
                 default:
@@ -109,6 +112,7 @@ public class UserPanel {
                 break;
             case 4:
                 UserPanel.addProduct();
+                break;
             case 5:
             case 6:
             default:
@@ -120,6 +124,7 @@ public class UserPanel {
         System.out.println("1. List all products in shopping cart");
         System.out.println("2. Add product");
         System.out.println("3. Delete product");
+        System.out.println("4. Checkout");
         System.out.print("Input the number option: ");
         Scanner scanner = new Scanner(System.in);
         int input = scanner.nextInt();
@@ -136,12 +141,45 @@ public class UserPanel {
                 listAllProductInCart();
                 deleteProductInCart();
                 break;
+            case 4:
+                checkoutCart();
             default:
                 break;
         }
 
     }
 
+
+    public static void accountManagement() throws SQLException {
+
+        System.out.println("");
+        System.out.println("1. Change userName(Login name)");
+        System.out.println("2. Change password");
+        System.out.println("3. Change telephone number");
+        System.out.println("4. Change shipping address");
+        System.out.println("Input anything to upper menu.");
+        System.out.print("Input the number option: ");
+
+        Scanner scanner = new Scanner(System.in);
+        int input = scanner.nextInt();
+
+        switch (input) {
+            case 1:
+                changeLoginName();
+                break;
+            case 2:
+                changePassword();
+                break;
+            case 3:
+                changeTel();
+                break;
+            case 4:
+                changeAddress();
+                break;
+            default:
+                break;
+        }
+    }
 
     static void clearScreen() throws IOException, InterruptedException {
         if (System.getProperty("os.name").contains("Windows"))
@@ -191,6 +229,102 @@ public class UserPanel {
         }
         st1.close(); // .close = commit
     }
+    private static void checkoutCart() {
+        try {
+            Console console = System.console();
+
+            // 读取要结算的产品数量
+            int quantity = Integer.parseInt(console.readLine());
+
+            // 查询产品价格和ID
+            List<Integer> productIDs = getProductIDsInCart();
+            Map<Integer, Double> productPrices = getProductPrices(productIDs);
+
+            // 更新产品列表中的数量并计算总价格
+            double totalPrice = 0;
+            String updateProductQuery = "UPDATE PRODUCT SET Quantity = Quantity - ? WHERE ProductID = ?";
+            PreparedStatement updateProductStatement = conx.prepareStatement(updateProductQuery);
+            for (int productID : productIDs) {
+                double pricePerUnit = productPrices.get(productID);
+                updateProductStatement.setInt(1, quantity);
+                updateProductStatement.setInt(2, productID);
+                updateProductStatement.executeUpdate();
+                totalPrice += pricePerUnit * quantity;
+            }
+            updateProductStatement.close();
+
+            // 复制购物车内容到包裹表
+            String insertParcelQuery = "INSERT INTO PARCEL(UserID, ProductID, Quantity, ShippingAddress, TotalPrice) SELECT UserID, ProductID, Quantity, Shipping_address, ? FROM CART WHERE UserID = ?";
+            PreparedStatement insertParcelStatement = conx.prepareStatement(insertParcelQuery);
+            insertParcelStatement.setDouble(1, totalPrice);
+            insertParcelStatement.setInt(2, UserPanel.userID);
+            insertParcelStatement.executeUpdate();
+            insertParcelStatement.close();
+
+            // 获取用户地址并填入包裹表
+            String updateParcelQuery = "UPDATE PARCEL SET ShippingAddress = (SELECT Shipping_address FROM USER WHERE UserID = ?) WHERE UserID = ?";
+            PreparedStatement updateParcelStatement = conx.prepareStatement(updateParcelQuery);
+            updateParcelStatement.setInt(1, UserPanel.userID);
+            updateParcelStatement.setInt(2, UserPanel.userID);
+            updateParcelStatement.executeUpdate();
+            updateParcelStatement.close();
+
+            // 清空购物车
+            String deleteCartQuery = "DELETE FROM CART WHERE UserID = ?";
+            PreparedStatement deleteCartStatement = conx.prepareStatement(deleteCartQuery);
+            deleteCartStatement.setInt(1, UserPanel.userID);
+            deleteCartStatement.executeUpdate();
+            deleteCartStatement.close();
+
+            System.out.println("Checkout completed!");
+        } catch (Exception e) {
+            System.out.println("Invalid input. Check if the ID exists.");
+        }
+    }
+
+    // 获取购物车中的产品ID列表
+    private static List<Integer> getProductIDsInCart() throws SQLException {
+        List<Integer> productIDs = new ArrayList<>();
+
+        String selectProductIDsQuery = "SELECT DISTINCT ProductID FROM CART WHERE UserID = ?";
+        PreparedStatement selectProductIDsStatement = conx.prepareStatement(selectProductIDsQuery);
+        selectProductIDsStatement.setInt(1, UserPanel.userID);
+        ResultSet resultSet = selectProductIDsStatement.executeQuery();
+
+        while (resultSet.next()) {
+            int productID = resultSet.getInt("ProductID");
+            productIDs.add(productID);
+        }
+
+        resultSet.close();
+        selectProductIDsStatement.close();
+
+        return productIDs;
+    }
+
+    // 查询产品价格的方法
+    private static Map<Integer, Double> getProductPrices(List<Integer> productIDs) throws SQLException {
+        Map<Integer, Double> productPrices = new HashMap<>();
+
+        String selectPriceQuery = "SELECT ProductID, Price FROM PRODUCT WHERE ProductID IN (" + String.join(",", Collections.nCopies(productIDs.size(), "?")) + ")";
+        PreparedStatement selectPriceStatement = conx.prepareStatement(selectPriceQuery);
+        for (int i = 0; i < productIDs.size(); i++) {
+            selectPriceStatement.setInt(i + 1, productIDs.get(i));
+        }
+        ResultSet resultSet = selectPriceStatement.executeQuery();
+
+        while (resultSet.next()) {
+            int productID = resultSet.getInt("ProductID");
+            double pricePerUnit = resultSet.getDouble("Price");
+            productPrices.put(productID, pricePerUnit);
+        }
+
+        resultSet.close();
+        selectPriceStatement.close();
+
+        return productPrices;
+    }
+
 
     static void addProduct() throws SQLException {
         Console console = System.console();
@@ -219,8 +353,6 @@ public class UserPanel {
     }
     private static void checkParcel() throws SQLException, IOException, InterruptedException {
         ResultSet productList;
-
-
         clearScreen();
         try {
             Statement st1 = conx.createStatement();
@@ -240,55 +372,26 @@ public class UserPanel {
             System.out.println("Something wrong in checkParcel(). Note to admin");
         }
     }
-    public static void accountManagement() {
 
-        System.out.println("");
-        System.out.println("1. Change userName(Login name)");
-        System.out.println("2. Change password");
-        System.out.println("3. Change telephone number");
-        System.out.println("4. Change shipping address");
-        System.out.println("Input anything to upper menu.");
-        System.out.print("Input the number option: ");
-
-        Scanner scanner = new Scanner(System.in);
-        int input = scanner.nextInt();
-
-        switch (input) {
-            case 1:
-                changeLoginName();
-                break;
-            case 2:
-                changePassword();
-                break;
-            case 3:
-                changeTel();
-            case 4:
-                changeAddress();
-            default:
-                break;
-        }
-    }
-    private static void changeAddress() {
+    private static void changeAddress() throws SQLException {
         Console console = System.console();
 
         System.out.print("Enter New Address: ");
         try {
             String shippingAddress = console.readLine();
 
-            String insertQuery = "UPDATE CUSTOMER SET (Shipping_address = ? )  WHERE USER_ID = ? ";
+            String insertQuery = "UPDATE CUSTOMER SET Shipping_address = ? WHERE UserID = ? ";
 
             PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
-
             preparedStatement.setString(1, shippingAddress);
             preparedStatement.setInt(2, UserPanel.userID);
             System.out.println();
-
             preparedStatement.executeUpdate();
             preparedStatement.close();
             System.out.println("Address Update!");
         }catch (Exception e)
         {
-            System.out.println("Invalid input. Check the id exist");
+            System.out.println("Invalid input. Check the input and try again.");
         }
     }
 
@@ -296,9 +399,46 @@ public class UserPanel {
     }
 
     private static void changePassword() {
+        Console console = System.console();
+
+        System.out.print("Enter New password: ");
+        try {
+            String pwd = console.readLine();
+
+            String insertQuery = "UPDATE CUSTOMER SET Password = ? WHERE UserID = ? ";
+
+            PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
+            preparedStatement.setString(1, pwd);
+            preparedStatement.setInt(2, UserPanel.userID);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            System.out.println("Password Update!");
+        }catch (Exception e)
+        {
+            System.out.println("Invalid input. Check the input and try again.");
+        }
     }
 
     private static void changeLoginName() {
+        Console console = System.console();
+
+        System.out.print("Enter New LoginName: ");
+        try {
+            String Username = console.readLine();
+
+            String insertQuery = "UPDATE CUSTOMER SET Username = ? WHERE UserID = ? ";
+
+            PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
+            preparedStatement.setString(1, Username);
+            preparedStatement.setInt(2, UserPanel.userID);
+            System.out.println();
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            System.out.println("LoginName Update!");
+        }catch (Exception e)
+        {
+            System.out.println("Invalid input. Check the input and try again.");
+        }
 
     }
 
@@ -350,29 +490,6 @@ public class UserPanel {
             UserPanel.clearScreen();
         }
         st1.close();
-//        Console console= System.console();
-//        System.out.print("Input the product id: ");
-//
-//        try {
-//            int productID = Integer.parseInt(console.readLine());
-//            ResultSet productList;
-//            Statement st1 = conx.createStatement();
-//
-//            clearScreen();
-//
-//            productList = st1.executeQuery("SELECT * FROM PRODUCT where ProductID=" + productID);
-//            System.out.printf("%-15s %-10s %-15s %-17s%n", "Product Name", "Product ID", "Product Price", "Product Quantity");
-//            System.out.println("==============================================================================================");
-//            while (productList.next()) {
-//                System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getString(1), productList.getInt(2),
-//                        productList.getInt(3), productList.getInt(4));
-//                st1.close(); // .close = commit
-//            }
-//        }
-//        catch(Exception e){
-//            clearScreen();
-//            System.out.println("Invalid input. Try again");
-//        }
     }
     private static void deleteProductInCart() {
         Console console = System.console();
@@ -381,19 +498,22 @@ public class UserPanel {
         try {
             int productID = Integer.parseInt(console.readLine());
 
-            String insertQuery = "DELETE FROM CART WHERE USER_ID = ? AND PRODUCT_ID = ? ";
+            String deleteQuery = "DELETE FROM CART WHERE UserID = ? AND ProductID = ?";
 
-            PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
+            PreparedStatement preparedStatement = conx.prepareStatement(deleteQuery);
             preparedStatement.setInt(1, UserPanel.userID);
             preparedStatement.setInt(2, productID);
-            System.out.println();
 
-            preparedStatement.executeUpdate();
+            int rowsAffected = preparedStatement.executeUpdate();
             preparedStatement.close();
-            System.out.println("Product delete!");
-        }catch (Exception e)
-        {
-            System.out.println("Invalid input. Check the id exist");
+
+            if (rowsAffected > 0) {
+                System.out.println("Product deleted!");
+            } else {
+                System.out.println("Product not found in the cart.");
+            }
+        } catch (Exception e) {
+            System.out.println("Invalid input. Check if the ID exists.");
         }
     }
 

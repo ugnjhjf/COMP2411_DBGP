@@ -236,4 +236,55 @@ public class AdminPanel {
         preparedStatement.close();
         System.out.println("User Added!");
     }
+    private static void analyzeSales() {
+        try {
+            // 查询售出物品的数量
+            String quantityQuery = "SELECT SUM(Quantity) AS TotalQuantity FROM PARCEL";
+            Statement quantityStatement = conx.createStatement();
+            ResultSet quantityResult = quantityStatement.executeQuery(quantityQuery);
+
+            if (quantityResult.next()) {
+                int totalQuantity = quantityResult.getInt("TotalQuantity");
+                System.out.println("Total quantity of sold items: " + totalQuantity);
+            }
+
+            quantityResult.close();
+            quantityStatement.close();
+
+            // 查询最畅销的产品名称
+            String topProductQuery = "SELECT p.ProductName, SUM(pr.Quantity) AS TotalQuantity " +
+                    "FROM PRODUCT p " +
+                    "JOIN PARCEL pr ON p.ProductID = pr.ProductID " +
+                    "GROUP BY p.ProductName " +
+                    "ORDER BY TotalQuantity DESC " +
+                    "FETCH FIRST ROW ONLY";
+            Statement topProductStatement = conx.createStatement();
+            ResultSet topProductResult = topProductStatement.executeQuery(topProductQuery);
+
+            if (topProductResult.next()) {
+                String topProductName = topProductResult.getString("ProductName");
+                int topProductQuantity = topProductResult.getInt("TotalQuantity");
+                System.out.println("Top selling product: " + topProductName + " (Quantity: " + topProductQuantity + ")");
+            }
+
+            topProductResult.close();
+            topProductStatement.close();
+
+            // 查询交易总数
+            String totalTransactionsQuery = "SELECT COUNT(*) AS TotalTransactions FROM PARCEL";
+            Statement totalTransactionsStatement = conx.createStatement();
+            ResultSet totalTransactionsResult = totalTransactionsStatement.executeQuery(totalTransactionsQuery);
+
+            if (totalTransactionsResult.next()) {
+                int totalTransactions = totalTransactionsResult.getInt("TotalTransactions");
+                System.out.println("Total number of transactions: " + totalTransactions);
+            }
+
+            totalTransactionsResult.close();
+            totalTransactionsStatement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
