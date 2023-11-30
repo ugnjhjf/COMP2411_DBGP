@@ -48,11 +48,11 @@ INSERT INTO CART (UserID, ProductID, Quantity) VALUES (1004,0004,2);
 select * from CART;
 commit;
 
-INSERT INTO REVIEW (ReviewID,ProductID,UserID,UserComment) VALUES (7001,0001,1001,'Strongly disagree');
-INSERT INTO REVIEW (ReviewID,ProductID,UserID,UserComment) VALUES (7002,0002,1002,'OK');
-INSERT INTO REVIEW (ReviewID,ProductID,UserID,UserComment) VALUES (7003,0003,1003,'I dont believe you');
-SELECT * from REVIEW;
-commit;
+-- INSERT INTO REVIEW (ReviewID,ProductID,UserID,UserComment) VALUES (7001,0001,1001,'Strongly disagree');
+-- INSERT INTO REVIEW (ReviewID,ProductID,UserID,UserComment) VALUES (7002,0002,1002,'OK');
+-- INSERT INTO REVIEW (ReviewID,ProductID,UserID,UserComment) VALUES (7003,0003,1003,'I dont believe you');
+-- SELECT * from REVIEW;
+-- commit;
 
 INSERT INTO CHECKOUT (UserID,ProductID,ParcelID) VALUES (1001,0001,5001);
 INSERT INTO CHECKOUT (UserID,ProductID,ParcelID) VALUES (1002,0002,5002);

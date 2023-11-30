@@ -61,8 +61,8 @@ public class UserPanel {
             System.out.println("1. Search item");
             System.out.println("2. Inspect shopping cart");
             System.out.println("3. Check parcel status");
-            System.out.println("4. Account settings");
-            System.out.println("Enter -1 to exit");
+            System.out.println("4. Account settings\n");
+            System.out.println("Enter -1 to exit\n");
             System.out.print("Input the number option: ");
             Scanner scanner = new Scanner(System.in);
             int input = scanner.nextInt();
@@ -92,11 +92,11 @@ public class UserPanel {
     }
 
     public static void searchItem() throws SQLException, IOException, InterruptedException {
-        System.out.println("");
+        System.out.println("\nEntered search item menu\n");
         System.out.println("1. Search by product name");
         System.out.println("2. Search by product ID");
         System.out.println("3. List all products");
-        System.out.println("4. Add product");
+        System.out.println("4. Add product\n");
         System.out.print("Input the number option: ");
         Scanner scanner = new Scanner(System.in);
         int input = scanner.nextInt();
@@ -207,124 +207,188 @@ public class UserPanel {
         return false;
     }
 
-   
+
     public static void listAllProduct() throws SQLException, IOException, InterruptedException {
-
-        ResultSet productList;
-        Statement st1 = conx.createStatement();
-
         clearScreen();
-
-        productList = st1.executeQuery("SELECT * FROM PRODUCT");
-//        ProductID    NUMBER(4) PRIMARY KEY,
-//        ProductName  VARCHAR(50),
-//                Price Number(4),
-//                Specification  VARCHAR(50),
-//                Description  VARCHAR(50),
-//                SellerID NUMBER(4),
-        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product ID", "Product Name", "Product Price", "Product Quantity");
-        System.out.println("==============================================================================================");
-        while (productList.next()) {
-            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getInt(1), productList.getString(2),
-                    productList.getInt(3), productList.getString(4),productList.getString(5));
+        System.out.println("\nProducts in stock are shown below: ");
+        System.out.println("Products ID, Product Name, Product Price, Product specification, Product description, Seller ID");
+        Statement st1;
+        st1 = conx.createStatement();
+        ResultSet rs;
+        rs = st1.executeQuery("SELECT * FROM PRODUCT");
+        while (rs.next()){
+            System.out.println(rs.getString(1)
+                    + " " + rs.getString(2)+
+                    " " + rs.getString(3)+
+                    " "+rs.getString(4)+
+                    " "+rs.getString(5)+
+                    " "+rs.getString(6)+
+                    " "+rs.getString(7));
         }
-        st1.close(); // .close = commit
+        System.out.println();
+        st1.close();
+
+//        ResultSet productList;
+//        Statement st1 = conx.createStatement();
+//
+//        clearScreen();
+//
+//        productList = st1.executeQuery("SELECT * FROM PRODUCT");
+//
+//        System.out.printf("%-12s %-20s %-10s %-20s %-20s%n", "Product ID", "Product Name", "Product Price", "Specification", "Description");
+//        System.out.println("==============================================================================================");
+//        while (productList.next()) {
+//            System.out.printf( productList.getInt(1)+"   "+ productList.getString(2)+"   "+
+//                    productList.getInt(3)+"   "+productList.getString(4)+"   "+ productList.getString(5));
+//        }
+//        st1.close();
     }
-    private static void checkoutCart() {
+    public static void checkoutCart() {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
         try {
-            Console console = System.console();
+            // 获取购物车中的商品信息
+            String cartQuery = "SELECT c.ProductID, p.ProductName, c.Quantity, p.Price " +
+                    "FROM CART c " +
+                    "JOIN PRODUCT p ON c.ProductID = p.ProductID " +
+                    "WHERE c.UserID = ?";
+            stmt = conx.prepareStatement(cartQuery);
+            stmt.setInt(1, userID);
+            rs = stmt.executeQuery();
 
-            // 读取要结算的产品数量
-            int quantity = Integer.parseInt(console.readLine());
+            List<CartItem> cartItems = new ArrayList<>();
+            double totalCost = 0.0;
 
-            // 查询产品价格和ID
-            List<Integer> productIDs = getProductIDsInCart();
-            Map<Integer, Double> productPrices = getProductPrices(productIDs);
+            // 输出购物车内容，计算总价格
+            System.out.printf("%-12s %-20s %-10s %-10s%n", "Product ID", "Product Name", "Quantity", "Price");
+            System.out.println("===============================================");
+            while (rs.next()) {
+                int productID = rs.getInt(1);
+                String productName = rs.getString(2);
+                int quantity = rs.getInt(3);
+                int price = rs.getInt(4);
 
-            // 更新产品列表中的数量并计算总价格
-            double totalPrice = 0;
-            String updateProductQuery = "UPDATE PRODUCT SET Quantity = Quantity - ? WHERE ProductID = ?";
-            PreparedStatement updateProductStatement = conx.prepareStatement(updateProductQuery);
-            for (int productID : productIDs) {
-                double pricePerUnit = productPrices.get(productID);
-                updateProductStatement.setInt(1, quantity);
-                updateProductStatement.setInt(2, productID);
-                updateProductStatement.executeUpdate();
-                totalPrice += pricePerUnit * quantity;
+                totalCost += quantity * price;
+
+                System.out.printf("%-12d %-20s %-10d %-10d %n", productID, productName, quantity, price);
+
+                cartItems.add(new CartItem(productID, quantity));
             }
-            updateProductStatement.close();
 
-            // 复制购物车内容到包裹表
-            String insertParcelQuery = "INSERT INTO PARCEL(UserID, ProductID, Quantity, ShippingAddress, TotalPrice) SELECT UserID, ProductID, Quantity, Shipping_address, ? FROM CART WHERE UserID = ?";
-            PreparedStatement insertParcelStatement = conx.prepareStatement(insertParcelQuery);
-            insertParcelStatement.setDouble(1, totalPrice);
-            insertParcelStatement.setInt(2, UserPanel.userID);
-            insertParcelStatement.executeUpdate();
-            insertParcelStatement.close();
+            // 输出总价格
+            System.out.println("===============================================");
+            System.out.println("Total Cost: " + totalCost);
 
-            // 获取用户地址并填入包裹表
-            String updateParcelQuery = "UPDATE PARCEL SET ShippingAddress = (SELECT Shipping_address FROM USER WHERE UserID = ?) WHERE UserID = ?";
-            PreparedStatement updateParcelStatement = conx.prepareStatement(updateParcelQuery);
-            updateParcelStatement.setInt(1, UserPanel.userID);
-            updateParcelStatement.setInt(2, UserPanel.userID);
-            updateParcelStatement.executeUpdate();
-            updateParcelStatement.close();
+            // 检查是否可以进行checkout
+            boolean canCheckout = true;
+            for (CartItem item : cartItems) {
+                int availableQuantity = getAvailableQuantity(item.getProductID());
 
-            // 清空购物车
-            String deleteCartQuery = "DELETE FROM CART WHERE UserID = ?";
-            PreparedStatement deleteCartStatement = conx.prepareStatement(deleteCartQuery);
-            deleteCartStatement.setInt(1, UserPanel.userID);
-            deleteCartStatement.executeUpdate();
-            deleteCartStatement.close();
+                if (availableQuantity < item.getQuantity()) {
+                    canCheckout = false;
+                    break;
+                }
+            }
 
-            System.out.println("Checkout completed!");
-        } catch (Exception e) {
-            System.out.println("Invalid input. Check if the ID exists.");
+            if (canCheckout) {
+                // 复制购物车内容到Parcel表并生成ParcelID
+
+                int parcelID = generateParcelID();
+                String insertParcelQuery = "INSERT INTO PARCEL (ParcelID, ProductID, Quantity, UserID) VALUES (?, ?, ?, ?)";
+                stmt = conx.prepareStatement(insertParcelQuery);
+                for (CartItem item : cartItems) {
+                    stmt.setInt(1, parcelID);
+                    stmt.setInt(2, item.getProductID());
+                    stmt.setInt(3, item.getQuantity());
+                    stmt.setInt(4, userID);
+
+                    stmt.addBatch();
+
+                    parcelID++;
+                }
+                stmt.executeBatch();
+
+                // 清空购物车
+                String clearCartQuery = "DELETE FROM CART WHERE UserID = ?";
+                stmt = conx.prepareStatement(clearCartQuery);
+                stmt.setInt(1, userID);
+                stmt.executeUpdate();
+
+                System.out.println("Checkout successful. ParcelID: " + parcelID);
+                stmt.close();
+            } else {
+                System.out.println("Insufficient stock. Cannot checkout.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    // 获取购物车中的产品ID列表
-    private static List<Integer> getProductIDsInCart() throws SQLException {
-        List<Integer> productIDs = new ArrayList<>();
-
-        String selectProductIDsQuery = "SELECT DISTINCT ProductID FROM CART WHERE UserID = ?";
-        PreparedStatement selectProductIDsStatement = conx.prepareStatement(selectProductIDsQuery);
-        selectProductIDsStatement.setInt(1, UserPanel.userID);
-        ResultSet resultSet = selectProductIDsStatement.executeQuery();
-
-        while (resultSet.next()) {
-            int productID = resultSet.getInt("ProductID");
-            productIDs.add(productID);
+    private static int getAvailableQuantity(int productID) throws SQLException {
+        try {
+            String stockQuery = "SELECT Quantity FROM PRODUCT WHERE ProductID = ?";
+            PreparedStatement stmt = conx.prepareStatement(stockQuery);
+            stmt.setInt(1, productID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                // 商品ID不存在，返回一个表示无效库存的特殊值
+                return -1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        resultSet.close();
-        selectProductIDsStatement.close();
-
-        return productIDs;
+        return 0;
     }
 
-    // 查询产品价格的方法
-    private static Map<Integer, Double> getProductPrices(List<Integer> productIDs) throws SQLException {
-        Map<Integer, Double> productPrices = new HashMap<>();
-
-        String selectPriceQuery = "SELECT ProductID, Price FROM PRODUCT WHERE ProductID IN (" + String.join(",", Collections.nCopies(productIDs.size(), "?")) + ")";
-        PreparedStatement selectPriceStatement = conx.prepareStatement(selectPriceQuery);
-        for (int i = 0; i < productIDs.size(); i++) {
-            selectPriceStatement.setInt(i + 1, productIDs.get(i));
+    private static int generateParcelID() throws SQLException {
+        try {
+            String parcelIDQuery = "SELECT COUNT(*) AS ParcelCount FROM PARCEL";
+            Statement stmt = conx.createStatement();
+            ResultSet rs = stmt.executeQuery(parcelIDQuery);
+            if (rs.next()) {
+                int count = rs.getInt("ParcelCount");
+                return 5001 + count;
+            }
         }
-        ResultSet resultSet = selectPriceStatement.executeQuery();
-
-        while (resultSet.next()) {
-            int productID = resultSet.getInt("ProductID");
-            double pricePerUnit = resultSet.getDouble("Price");
-            productPrices.put(productID, pricePerUnit);
+        catch(Exception e)
+        {
+            System.out.println("generate parcel ID have problem");
         }
-
-        resultSet.close();
-        selectPriceStatement.close();
-
-        return productPrices;
+        return 0;
     }
+
+    private static class CartItem {
+        private int productID;
+        private int quantity;
+
+        public CartItem(int productID, int quantity) {
+            this.productID = productID;
+            this.quantity = quantity;
+        }
+
+        public int getProductID() {
+            return productID;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+    }
+
 
 
     static void addProduct() throws SQLException {
@@ -353,19 +417,20 @@ public class UserPanel {
         }
     }
     private static void checkParcel() throws SQLException, IOException, InterruptedException {
-        ResultSet productList;
+
         clearScreen();
         try {
             Statement st1 = conx.createStatement();
-            productList = st1.executeQuery("SELECT PRODUCT.productName,PARCEL.Quantity,PARCEL.Shipping_address FROM PARCEL where UserID = " + UserPanel.userID + "" + "AND PRODUCT.ProductID = PARCEL.ProductID");
+            String checkParcel = "SELECT PRODUCT.productName,PARCEL.Quantity,PARCEL.Shipping_address FROM PRODUCT,PARCEL where UserID = ? AND PRODUCT.ProductID = PARCEL.ProductID";
+            PreparedStatement checkParcelStatement = conx.prepareStatement(checkParcel);
+            checkParcelStatement.setInt(1, UserPanel.userID);
+            ResultSet parcelList = checkParcelStatement.executeQuery();
             System.out.printf("%-15s %-10s %-15s %n", "Product Name", "Quantity", "Shipping address");
             System.out.println("==============================================================================================");
-            while (productList.next()) {
-                System.out.printf("%-15s %-10s %-15s %n", productList.getString(1), productList.getInt(2),
-                        productList.getString(3));
-
+            while (parcelList.next()) {
+                System.out.printf("%-15s %-10s %-15s %n", parcelList.getString(1), parcelList.getInt(2),
+                        parcelList.getString(3));
                 st1.close(); // .close = commit
-
             }
         }
         catch (Exception e)
@@ -410,7 +475,7 @@ public class UserPanel {
             preparedStatement.setInt(2, UserPanel.userID);
             preparedStatement.executeUpdate();
             preparedStatement.close();
-            System.out.println("Password Update!");
+            System.out.println("Telephone Update!");
         }catch (Exception e)
         {
             System.out.println("Invalid input. Check the input and try again.");
@@ -485,7 +550,8 @@ public class UserPanel {
             System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getInt(1), productList.getString(2),
                     productList.getInt(3), productList.getString(4),productList.getString(5));
         }
-        st1.close(); // .close = commit
+        st1.close();
+        System.out.println();// .close = commit
     }
     public static void searchByID() throws SQLException, IOException, InterruptedException {
         Console console= System.console();
@@ -545,11 +611,11 @@ public class UserPanel {
         UserPanel.clearScreen();
 
         productList = st1.executeQuery("SELECT * FROM CART where UserID = '" + UserPanel.userID + "'" );
-        System.out.printf("%-15s %-10s %-15s %-17s%n", "Product Name", "Product ID", "Product Price", "Product Quantity");
+        System.out.println("Product ID"+"               "+"Product Quantity");
         System.out.println("==============================================================================================");
         while (productList.next()) {
-            System.out.println(productList.getInt(1)+""+productList.getInt(2)+""+
-                    productList.getInt(3));
+            System.out.println(productList.getInt(1)+"        "+
+                    productList.getInt(2));
         }
         st1.close(); // .close = commit
     }

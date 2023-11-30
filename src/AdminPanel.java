@@ -127,10 +127,10 @@ public class AdminPanel {
                 if(price<10000){
                     break;
                 }else {
-                    System.out.println("Invalid input. Price must be a numeric value smaller than 10000.");
+                    System.out.println("Invalid input! Price value should smaller than 10000.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Price must be a numeric value smaller than 10000.");
+                System.out.println("Invalid input! Price must be a numeric value smaller than 10000.");
             }
         }
 
@@ -227,78 +227,197 @@ public class AdminPanel {
 //    }
     static void deleteItem() throws SQLException, IOException, InterruptedException {
         Console console = System.console();
-        System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
-        int productID = Integer.parseInt(console.readLine());
-
-        String checkQuery = "SELECT COUNT(*) FROM PRODUCT WHERE ProductID=?";
-        PreparedStatement checkStatement = conx.prepareStatement(checkQuery);
-        checkStatement.setInt(1, productID);
-        ResultSet resultSet = checkStatement.executeQuery();
-        resultSet.next();
-        int count = resultSet.getInt(1);
-        checkStatement.close();
-
-        if (count == 0) {
-            System.out.println("Sorry, this product does not exist in the database.");
-            return;
+        int productID;
+        while (true) {
+            System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
+            try {
+                productID = Integer.parseInt(console.readLine());
+                if(productID<1000&&productID>0){
+                    //还要判断是有撞productID
+                    String checkSellerQuery = "SELECT COUNT(*) FROM PRODUCT WHERE ProductID=?";
+                    PreparedStatement checkSellerStatement = conx.prepareStatement(checkSellerQuery);
+                    checkSellerStatement.setInt(1, productID);
+                    ResultSet productList = checkSellerStatement.executeQuery();
+                    productList.next();
+                    int productCount = productList.getInt(1);
+                    if (productCount == 0) {
+                        System.out.println("This Product is not exist in the product database.");
+                    }else{
+                        String deleteQuery = "DELETE FROM PRODUCT WHERE ProductID=?";
+                        PreparedStatement deleteStatement = conx.prepareStatement(deleteQuery);
+                        deleteStatement.setInt(1, productID);
+                        deleteStatement.executeUpdate();
+                        deleteStatement.close();
+                        checkSellerStatement.close();
+                        System.out.println("Product Deleted!");
+                        break;
+                    }
+                }else{
+                    System.out.println("Invalid input! ProductID must be a numeric value smaller than 1000.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input! ProductID must be a numeric value smaller than 1000.");
+            }
         }
-
-        String deleteQuery = "DELETE FROM PRODUCT WHERE ProductID=?";
-        PreparedStatement deleteStatement = conx.prepareStatement(deleteQuery);
-        deleteStatement.setInt(1, productID);
-        deleteStatement.executeUpdate();
-        deleteStatement.close();
-
-        System.out.println("Product Deleted!");
+//        Console console = System.console();
+//        System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
+//        int productID = Integer.parseInt(console.readLine());
+//        String checkQuery = "SELECT COUNT(*) FROM PRODUCT WHERE ProductID=?";
+//        PreparedStatement checkStatement = conx.prepareStatement(checkQuery);
+//        checkStatement.setInt(1, productID);
+//        ResultSet resultSet = checkStatement.executeQuery();
+//        resultSet.next();
+//        int count = resultSet.getInt(1);
+//        checkStatement.close();
+//
+//        if (count == 0) {
+//            System.out.println("Sorry, this product does not exist in the database.");
+//            return;
+//        }
+//
+//        String deleteQuery = "DELETE FROM PRODUCT WHERE ProductID=?";
+//        PreparedStatement deleteStatement = conx.prepareStatement(deleteQuery);
+//        deleteStatement.setInt(1, productID);
+//        deleteStatement.executeUpdate();
+//        deleteStatement.close();
+//
+//        System.out.println("Product Deleted!");
 
     }
 
     public static void searchByID() throws SQLException, IOException, InterruptedException {
-        Console console= System.console();
-        System.out.print("Input the product ID (begin with 0XXX): ");
-        int productID = Integer.parseInt(console.readLine());
-        Statement st1 = conx.createStatement();
+        clearScreen();
+        Console console = System.console();
 
-
-        ResultSet productList = st1.executeQuery("SELECT * FROM PRODUCT WHERE ProductID="+productID);
-        if(productList.next()){
-            System.out.println("\nProduct founded! Details of "+productList.getString(2)+" is shown below.\n");
-            System.out.println("ProductID: "+productList.getInt(1));
-            System.out.println("Product name: "+productList.getString(2));
-            System.out.println("Product price: "+productList.getInt(3));
-            System.out.println("Product specification: "+productList.getString(4));
-            System.out.println("Product description: "+productList.getString(5));
-            System.out.println("Product Seller ID: "+productList.getInt(6));
-            Thread.sleep(2000);
-        }else{
-            System.out.println("\nSorry, product is not founded!");
-            Thread.sleep(2500);
-            clearScreen();
+        int productID;
+        while (true) {
+            System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
+            try {
+                productID = Integer.parseInt(console.readLine());
+                if(productID<1000&&productID>0){
+                    //还要判断是有撞productID
+                    String checkSellerQuery = "SELECT COUNT(*) FROM PRODUCT WHERE ProductID=?";
+                    String wow = "SELECT * FROM PRODUCT WHERE ProductID=?";
+                    PreparedStatement checkSellerStatement = conx.prepareStatement(checkSellerQuery);
+                    PreparedStatement output = conx.prepareStatement(wow);
+                    checkSellerStatement.setInt(1, productID);
+                    output.setInt(1, productID);
+                    ResultSet productList = checkSellerStatement.executeQuery();
+                    ResultSet oo=output.executeQuery();
+                    productList.next();
+                    oo.next();
+                    int productCount = productList.getInt(1);
+                    checkSellerStatement.close();
+                    if (productCount == 0) {
+                        System.out.println("This Product is not exist in the product database.");
+                        Thread.sleep(2500);
+                        break;
+                    }else{
+                        System.out.println("\nProduct founded! Details of "+oo.getString(2)+" is shown below.\n");
+                        System.out.println("ProductID: "+oo.getInt(1));
+                        System.out.println("Product name: "+oo.getString(2));
+                        System.out.println("Product price: "+oo.getInt(3));
+                        System.out.println("Product specification: "+oo.getString(4));
+                        System.out.println("Product description: "+oo.getString(5));
+                        System.out.println("Product Seller ID: "+oo.getInt(6));
+                        Thread.sleep(2000);
+                        break;
+                    }
+                }else{
+                    System.out.println("Invalid input. ProductID must be a numeric value and smaller than 1000.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. ProductID must be a numeric value and smaller than 1000.");
+            }
         }
-        st1.close(); // .close = commit
+//        Console console= System.console();
+//        System.out.print("Input the product ID (begin with 0XXX): ");
+//        int productID = Integer.parseInt(console.readLine());
+//        Statement st1 = conx.createStatement();
+//
+//
+//        ResultSet productList = st1.executeQuery("SELECT * FROM PRODUCT WHERE ProductID="+productID);
+//        if(productList.next()){
+//            System.out.println("\nProduct founded! Details of "+productList.getString(2)+" is shown below.\n");
+//            System.out.println("ProductID: "+productList.getInt(1));
+//            System.out.println("Product name: "+productList.getString(2));
+//            System.out.println("Product price: "+productList.getInt(3));
+//            System.out.println("Product specification: "+productList.getString(4));
+//            System.out.println("Product description: "+productList.getString(5));
+//            System.out.println("Product Seller ID: "+productList.getInt(6));
+//            Thread.sleep(2000);
+//        }else{
+//            System.out.println("\nSorry, product is not founded!");
+//            Thread.sleep(2500);
+//            clearScreen();
+//        }
+//        st1.close(); // .close = commit
     }
 
     static void showAParcel() throws SQLException, IOException, InterruptedException {
-        Console console= System.console();
-        System.out.print("Input the parcel ID (begin with 5XXX): ");
-        int parcelID = Integer.parseInt(console.readLine());
-        Statement st1 = conx.createStatement();
+        clearScreen();
+        Console console = System.console();
 
-        ResultSet productList = st1.executeQuery("SELECT * FROM PARCEL WHERE ParcelID="+parcelID);
-        if(productList.next()){
-            System.out.println("\nParcel founded! Details of the parcel is shown below.\n");
-            System.out.println("Parcel ID: "+productList.getInt(1));
-            System.out.println("Product ID: "+productList.getInt(2));
-            System.out.println("Quantity: "+productList.getInt(3));
-            System.out.println("User ID: "+productList.getInt(4));
-            System.out.println("Shipping address: "+productList.getString(5));
-            Thread.sleep(2000);
-        }else{
-            System.out.println("\nSorry, this parcel is not founded!");
-            Thread.sleep(2500);
-            clearScreen();
+        int productID;
+        while (true) {
+            System.out.print("Enter ParcelID (4 numbers only, begin with 5XXX): ");
+            try {
+                productID = Integer.parseInt(console.readLine());
+                if(productID<7000&&productID>=5000){
+                    //还要判断是有撞parcelID
+                    String checkSellerQuery = "SELECT COUNT(*) FROM Parcel WHERE ParcelID=?";
+                    String wow = "SELECT * FROM Parcel WHERE ParcelID=?";
+                    PreparedStatement checkSellerStatement = conx.prepareStatement(checkSellerQuery);
+                    PreparedStatement output = conx.prepareStatement(wow);
+                    checkSellerStatement.setInt(1, productID);
+                    output.setInt(1, productID);
+                    ResultSet productList = checkSellerStatement.executeQuery();
+                    productList.next();
+                    int productCount = productList.getInt(1);
+                    checkSellerStatement.close();
+                    if (productCount == 0) {
+                        System.out.println("This Parcel is not exist in the database.");
+                        Thread.sleep(2500);
+                        break;
+                    }else{
+                        ResultSet oo=output.executeQuery();
+                        oo.next();
+                        System.out.println("\nParcel founded! Details are shown below.\n");
+                        System.out.println("Parcel ID: "+oo.getInt(1));
+                        System.out.println("Product ID: "+oo.getInt(2));
+                        System.out.println("Quantity: "+oo.getInt(3));
+                        System.out.println("User ID: "+oo.getInt(4));
+                        System.out.println("Shipping address: "+oo.getString(5));
+                        Thread.sleep(2000);
+                        break;
+                    }
+                }else{
+                    System.out.println("Invalid input! ParcelID must greater than 5000 smaller than 7000.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input! ParcelID must be a numeric value greater than 5000 smaller than 7000.");
+            }
         }
-        st1.close();
+//        Console console= System.console();
+//        System.out.print("Input the parcel ID (begin with 5XXX): ");
+//        int parcelID = Integer.parseInt(console.readLine());
+//        Statement st1 = conx.createStatement();
+//
+//        ResultSet productList = st1.executeQuery("SELECT * FROM PARCEL WHERE ParcelID="+parcelID);
+//        if(productList.next()){
+//            System.out.println("\nParcel founded! Details of the parcel is shown below.\n");
+//            System.out.println("Parcel ID: "+productList.getInt(1));
+//            System.out.println("Product ID: "+productList.getInt(2));
+//            System.out.println("Quantity: "+productList.getInt(3));
+//            System.out.println("User ID: "+productList.getInt(4));
+//            System.out.println("Shipping address: "+productList.getString(5));
+//            Thread.sleep(2000);
+//        }else{
+//            System.out.println("\nSorry, this parcel is not founded!");
+//            Thread.sleep(2500);
+//            clearScreen();
+//        }
+//        st1.close();
     }
 
     static void showAllItem() throws SQLException, IOException, InterruptedException {
