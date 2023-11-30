@@ -63,7 +63,7 @@ public class AdminPanel {
                 case "5":
                     showAParcel();
                     break;
-                case "6"://待实现
+                case "6"://待完善确认
                     analyzeSales();
                     break;
                 case "7":
@@ -90,63 +90,169 @@ public class AdminPanel {
         clearScreen();
         Console console = System.console();
 
-        System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
-        int productID = Integer.parseInt(console.readLine());
+        int productID;
+        while (true) {
+            System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
+
+            try {
+                productID = Integer.parseInt(console.readLine());
+                if(productID<1000&&productID>0){
+                    //还要判断是有撞productID
+                    String checkSellerQuery = "SELECT COUNT(*) FROM PRODUCT WHERE ProductID=?";
+                    PreparedStatement checkSellerStatement = conx.prepareStatement(checkSellerQuery);
+                    checkSellerStatement.setInt(1, productID);
+                    ResultSet sellerResultSet = checkSellerStatement.executeQuery();
+                    sellerResultSet.next();
+                    int productCount = sellerResultSet.getInt(1);
+                    checkSellerStatement.close();
+                    if (productCount == 1) {
+                        System.out.println("This ProductID is already exist in the database.");
+                    }else{
+                        break;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. ProductID must be a numeric value and smaller than 1000.");
+            }
+        }
+
         System.out.print("Enter ProductName: ");
         String productName = console.readLine();
-        System.out.print("Enter Price(4 digits integer only): ");
-        int  price; //= Integer.parseInt(console.readLine());
-        try{
-            price = Integer.parseInt(console.readLine());
-        }catch (Exception NumberFormatException){
-            System.out.print("Invalid number input! Please input again: ");
-            price = Integer.parseInt(console.readLine());
+
+        int price;
+        while (true) {
+            System.out.print("Enter Price (4 digits integer only): ");
+            try {
+                price = Integer.parseInt(console.readLine());
+                if(price<10000){
+                    break;
+                }else {
+                    System.out.println("Invalid input. Price must be a numeric value smaller than 10000.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Price must be a numeric value smaller than 10000.");
+            }
         }
 
         System.out.print("Enter Specification: ");
         String specification = console.readLine();
+
         System.out.print("Enter Description: ");
         String descript = console.readLine();
-        System.out.print("Enter SellerID(Existing Sellers only![4 numbers only, begin with 3XXX]): ");
-        int sellerID = Integer.parseInt(console.readLine());
 
+        int sellerID;
+        while (true) {
+            System.out.print("Enter SellerID (Existing Sellers only! 4 numbers only, begin with 3XXX): ");
+            try {
+                sellerID = Integer.parseInt(console.readLine());
+                if(sellerID>=3000 && sellerID<5000){
+                    //判断是否存在SellerID
+                    String checkSellerQuery = "SELECT COUNT(*) FROM SELLER WHERE SellerID=?";
+                    PreparedStatement checkSellerStatement = conx.prepareStatement(checkSellerQuery);
+                    checkSellerStatement.setInt(1, sellerID);
+                    ResultSet sellerResultSet = checkSellerStatement.executeQuery();
+                    sellerResultSet.next();
+                    int sellerCount = sellerResultSet.getInt(1);
+                    checkSellerStatement.close();
+                    if (sellerCount == 0) {
+                        System.out.println("SellerID does not exist in the database.");
+                    }else{
+                        break;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. SellerID must be a numeric value .");
+            }
+        }
+
+        // Check if the SellerID exists in the database
+//        String checkSellerQuery = "SELECT COUNT(*) FROM SELLER WHERE SellerID=?";
+//        PreparedStatement checkSellerStatement = conx.prepareStatement(checkSellerQuery);
+//        checkSellerStatement.setInt(1, sellerID);
+//        ResultSet sellerResultSet = checkSellerStatement.executeQuery();
+//        sellerResultSet.next();
+//        int sellerCount = sellerResultSet.getInt(1);
+//        checkSellerStatement.close();
+
+//        if (sellerCount == 0) {
+//            System.out.println("SellerID does not exist in the database.");
+//            return;
+//        }
+
+        // Insert the product
         String insertQuery = "INSERT INTO PRODUCT(ProductID,ProductName,Price,Specification,Description,SellerID) VALUES (?, ?, ?, ?, ?, ?)";
+        PreparedStatement insertStatement = conx.prepareStatement(insertQuery);
+        insertStatement.setInt(1, productID);
+        insertStatement.setString(2, productName);
+        insertStatement.setInt(3, price);
+        insertStatement.setString(4, specification);
+        insertStatement.setString(5, descript);
+        insertStatement.setInt(6, sellerID);
 
-        PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
-        preparedStatement.setInt(1, productID);
-        preparedStatement.setString(2, productName);
-        preparedStatement.setInt(3, price);
-        preparedStatement.setString(4, specification);
-        preparedStatement.setString(5, descript);
-        preparedStatement.setInt(6, sellerID);
-
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
+        insertStatement.executeUpdate();
+        insertStatement.close();
         System.out.println("Product Added Successfully!");
     }
+
+//    static void addItem() throws SQLException, IOException, InterruptedException {
+//        clearScreen();
+//        Console console = System.console();
+//
+//        System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
+//        int productID = Integer.parseInt(console.readLine());
+//        System.out.print("Enter ProductName: ");
+//        String productName = console.readLine();
+//        System.out.print("Enter Price(4 digits integer only): ");
+//        int  price= Integer.parseInt(console.readLine());
+//        System.out.print("Enter Specification: ");
+//        String specification = console.readLine();
+//        System.out.print("Enter Description: ");
+//        String descript = console.readLine();
+//        System.out.print("Enter SellerID(Existing Sellers only![4 numbers only, begin with 3XXX]): ");
+//        int sellerID = Integer.parseInt(console.readLine());
+//
+//        String insertQuery = "INSERT INTO PRODUCT(ProductID,ProductName,Price,Specification,Description,SellerID) VALUES (?, ?, ?, ?, ?, ?)";
+//
+//        PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
+//        preparedStatement.setInt(1, productID);
+//        preparedStatement.setString(2, productName);
+//        preparedStatement.setInt(3, price);
+//        preparedStatement.setString(4, specification);
+//        preparedStatement.setString(5, descript);
+//        preparedStatement.setInt(6, sellerID);
+//
+//        preparedStatement.executeUpdate();
+//        preparedStatement.close();
+//        System.out.println("Product Added Successfully!");
+//    }
     static void deleteItem() throws SQLException, IOException, InterruptedException {
         Console console = System.console();
         System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
         int productID = Integer.parseInt(console.readLine());
 
+        String checkQuery = "SELECT COUNT(*) FROM PRODUCT WHERE ProductID=?";
+        PreparedStatement checkStatement = conx.prepareStatement(checkQuery);
+        checkStatement.setInt(1, productID);
+        ResultSet resultSet = checkStatement.executeQuery();
+        resultSet.next();
+        int count = resultSet.getInt(1);
+        checkStatement.close();
+
+        if (count == 0) {
+            System.out.println("Sorry, this product does not exist in the database.");
+            return;
+        }
+
         String deleteQuery = "DELETE FROM PRODUCT WHERE ProductID=?";
-        PreparedStatement preparedStatement = conx.prepareStatement(deleteQuery);
-        preparedStatement.setInt(1, productID);
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
+        PreparedStatement deleteStatement = conx.prepareStatement(deleteQuery);
+        deleteStatement.setInt(1, productID);
+        deleteStatement.executeUpdate();
+        deleteStatement.close();
+
         System.out.println("Product Deleted!");
+
     }
 
-    /* static void showAProduct() throws SQLException {
-         Console console = System.console();
-         System.out.print("Enter ProductID: ");
-         int productID = Integer.parseInt(console.readLine());
-         String locQ="SELECT * FROM PRODUCT WHERE ProductID=?";
-         PreparedStatement ps=conx.prepareStatement(locQ);
-         ps.executeQuery(locQ);
-         ps.setInt(1,productID);
-         ps.close();
-     }*/
     public static void searchByID() throws SQLException, IOException, InterruptedException {
         Console console= System.console();
         System.out.print("Input the product ID (begin with 0XXX): ");
@@ -172,7 +278,6 @@ public class AdminPanel {
         st1.close(); // .close = commit
     }
 
-    //showParcel还在建设当中
     static void showAParcel() throws SQLException, IOException, InterruptedException {
         Console console= System.console();
         System.out.print("Input the parcel ID (begin with 5XXX): ");
