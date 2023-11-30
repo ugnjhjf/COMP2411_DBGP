@@ -19,7 +19,7 @@ public class UserPanel {
         OracleConnection conn = null;
         while (!(loginOracle)) { //Login Orcale
 
-            System.out.print("Enter your DBMS username: 22084045d");    // Your Oracle ID with double quote
+            System.out.print("Enter your DBMS username: ");    // Your Oracle ID with double quote
             String username = console.readLine();         // e.g. "98765432d"     String username = console.readLine();         // e.g. "98765432d"
             System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
 
@@ -306,13 +306,14 @@ public class UserPanel {
                 // 复制购物车内容到Parcel表并生成ParcelID
 
                 int parcelID = generateParcelID();
-                String insertParcelQuery = "INSERT INTO PARCEL (ParcelID, ProductID, Quantity, UserID) VALUES (?, ?, ?, ?)";
+                String insertParcelQuery = "INSERT INTO PARCEL (ParcelID, ProductID, Quantity, UserID,Shipping_address) VALUES (?, ?, ?, ?, ?)";
                 stmt = conx.prepareStatement(insertParcelQuery);
                 for (CartItem item : cartItems) {
                     stmt.setInt(1, parcelID);
                     stmt.setInt(2, item.getProductID());
                     stmt.setInt(3, item.getQuantity());
                     stmt.setInt(4, userID);
+                    stmt.setString(5,getShippingAddress(userID));
 
                     stmt.addBatch();
 
@@ -346,6 +347,7 @@ public class UserPanel {
             }
         }
     }
+
 
     private static int getAvailableQuantity(int productID) throws SQLException {
         try {
@@ -398,8 +400,36 @@ public class UserPanel {
         public int getQuantity() {
             return quantity;
         }
-    }
 
+
+    }
+    public static String getShippingAddress(int userID) throws SQLException {
+        String address = "";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT Shipping_address FROM CUSTOMER WHERE UserID = ?";
+            stmt = conx.prepareStatement(query);
+            stmt.setInt(1, userID);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                address = rs.getString(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
+        }
+
+        return address;
+    }
 
 
     static void addProduct() throws SQLException {
