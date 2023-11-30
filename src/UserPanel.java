@@ -40,7 +40,7 @@ public class UserPanel {
         System.out.println("Database Login successfully");
         System.out.println(" ");
 
-        while (!(loginStatus)) { //Login user account (OSS)
+        if (!(loginStatus)) { //Login user account (OSS)
             System.out.println("Please login your account to continue - Metaverse Online Shopping System");
             System.out.print("Input your username: ");
             String InputUserName = console.readLine();
@@ -49,6 +49,17 @@ public class UserPanel {
 //            String InputUserPwd = "pass2";
             String InputUserPwd = console.readLine();
             loginStatus = loginCheck(InputUserName, InputUserPwd);
+            while (!(loginStatus)){
+                System.out.println("\nInvalid Username or password! Please Retry.");
+                System.out.print("Input your username: ");
+                InputUserName = console.readLine();
+//            String InputUserName = "Jones1";
+                System.out.print("Input your password: ");
+//            String InputUserPwd = "pass2";
+                InputUserPwd = console.readLine();
+                loginStatus = loginCheck(InputUserName, InputUserPwd);
+            }
+
         }
 
         clearScreen();
@@ -394,7 +405,7 @@ public class UserPanel {
     static void addProduct() throws SQLException {
         Console console = System.console();
 
-        System.out.print("Enter ProductID: ");
+        System.out.print("Enter ProductID(4 digits number begin with 0XXX): ");
         try {
             int productID = Integer.parseInt(console.readLine());
 

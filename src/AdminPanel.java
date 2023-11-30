@@ -155,13 +155,15 @@ public class AdminPanel {
                     int sellerCount = sellerResultSet.getInt(1);
                     checkSellerStatement.close();
                     if (sellerCount == 0) {
-                        System.out.println("SellerID does not exist in the database.");
+                        System.out.println("SellerID does not exist in the database. Please input again!");
                     }else{
                         break;
                     }
+                }else{
+                    System.out.println("Invalid input! SellerID should greater than 3000 smaller than 5000.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. SellerID must be a numeric value .");
+                System.out.println("Invalid input! SellerID must be a numeric value greater than 3000 smaller than 5000.");
             }
         }
 
@@ -194,7 +196,7 @@ public class AdminPanel {
         System.out.println("Product Added Successfully!");
     }
 
-//    static void addItem() throws SQLException, IOException, InterruptedException {
+    //    static void addItem() throws SQLException, IOException, InterruptedException {
 //        clearScreen();
 //        Console console = System.console();
 //
@@ -423,7 +425,7 @@ public class AdminPanel {
     static void showAllItem() throws SQLException, IOException, InterruptedException {
         clearScreen();
         System.out.println("\nProducts in stock are shown below: ");
-        System.out.println("Products ID, Product Name, Product Price, Product specification, Product description, Seller ID");
+        System.out.println("Products ID, Product Name, Product Price, Product specification, Product description, Seller ID, Quantity");
         Statement st1;
         st1 = conx.createStatement();
         ResultSet rs;
@@ -434,7 +436,8 @@ public class AdminPanel {
                     " " + rs.getString(3)+
                     " "+rs.getString(4)+
                     " "+rs.getString(5)+
-                    " "+rs.getString(6));
+                    " "+rs.getString(6)+
+                    " "+rs.getInt(7));
         }
         st1.close();
 
