@@ -14,7 +14,7 @@ public class OSS {
             System.out.println("1. User Panel");
             System.out.println("2. Admin Panel");
             System.out.println("\nEnter -1 to exit this system.");
-            System.out.println("\nPlease enter the login option: ");
+            System.out.print("\nPlease enter the login option: ");
             String option = console.readLine();
             switch (option)
             {

@@ -615,7 +615,8 @@ public class AdminPanel {
             System.out.println("6. Analyze");
 
             //Completed
-            System.out.println("7. Manually add new user");
+            System.out.println("7. Register new user");
+            System.out.println("8. Print all users");
 
             System.out.println("\nEnter -1 to exit\n");
             System.out.print("Please enter the number option: ");
@@ -638,11 +639,14 @@ public class AdminPanel {
                 case "5":
                     showAParcel();
                     break;
-                case "6"://待完善确认
+                case "6":
                     analyzeSales();
                     break;
                 case "7":
                     addUser();
+                    break;
+                case "8":
+                    showAllUser();
                     break;
                 case "-1":
                     System.out.println("Exiting admin panel...");
@@ -654,4 +658,22 @@ public class AdminPanel {
             }
         }
     }
+    private static void showAllUser() throws SQLException,IOException,InterruptedException{
+        clearScreen();
+        System.out.println("\nUsers in database are shown below: ");
+        System.out.println("User ID, Username, Password, Telephone, Shipping_address, Seller ID");
+        Statement st1;
+        st1 = conx.createStatement();
+        ResultSet rs;
+        rs = st1.executeQuery("SELECT * FROM CUSTOMER");
+        while (rs.next()){
+            System.out.println(rs.getString(1)
+                    + " " + rs.getString(2)+
+                    " " + rs.getString(3)+
+                    " "+rs.getString(4)+
+                    " "+rs.getString(5));
+        }
+        st1.close();
+    }
+
 }
