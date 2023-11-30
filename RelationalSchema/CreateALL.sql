@@ -22,9 +22,9 @@ CREATE TABLE CUSTOMER(
 );
 INSERT INTO CUSTOMER (UserID, Username, Password, Tel, Shipping_address) VALUES (1001, 'Echidna', '123456', '46002000', 'Beijing');
 INSERT INTO CUSTOMER (UserID, Username, Password, Tel, Shipping_address) VALUES (1002,'HatsureMiku','mikuyyds','114514','Japan');
-INSERT INTO CUSTOMER (UserID, Username, Password, Tel, Shipping_address) VALUES (1003,'Needy Girl','wyyyz','7355608','German')
+INSERT INTO CUSTOMER (UserID, Username, Password, Tel, Shipping_address) VALUES (1003,'Needy Girl','wyyyz','7355608','German');
 INSERT INTO CUSTOMER (UserID, Username, Password, Tel, Shipping_address) VALUES (1004,'Rokidna','121212','23093821','Akihabara');
-INSERT INTO CUSTOMER (UserID, Username, Password, Tel, Shipping_address) VALUES (1005,'ugnjhjf','139101','51000001','Tsim Sha Tsui')
+INSERT INTO CUSTOMER (UserID, Username, Password, Tel, Shipping_address) VALUES (1005,'ugnjhjf','139101','51000001','Tsim Sha Tsui');
 
 CREATE TABLE PRODUCT
 (
@@ -40,7 +40,7 @@ CREATE TABLE PRODUCT
             REFERENCES SELLER(SellerID)
 );
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0001,'RPG 7',1500,'red','a powerful weapon',3004,10);
-INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0002,'Happy Potion',66,'colorful','let you dive into tRAnCe')
+INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0002,'Happy Potion',66,'colorful','let you dive into tRAnCe');
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0003,'pencil',10,'blue','made in china',3002,500);
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0004,'Vanilla',9999,'La Soleil','',3009,500);
 CREATE TABLE CART
