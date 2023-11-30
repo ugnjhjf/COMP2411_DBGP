@@ -655,8 +655,8 @@ public class UserPanel {
         System.out.println("Product ID"+"               "+"Product Quantity");
         System.out.println("==============================================================================================");
         while (productList.next()) {
-            System.out.println(productList.getInt(1)+"        "+
-                    productList.getInt(2));
+            System.out.println(productList.getInt(2)+"        "+
+                    productList.getInt(3));
         }
         st1.close(); // .close = commit
     }
