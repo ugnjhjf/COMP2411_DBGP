@@ -42,6 +42,7 @@ CREATE TABLE PRODUCT
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0001,'RPG 7',1500,'red','a powerful weapon',3004,10);
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0002,'Happy Potion',66,'colorful','let you dive into tRAnCe')
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0003,'pencil',10,'blue','made in china',3002,500);
+INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0004,'Vanilla',9999,'La Soleil','',3009,500);
 CREATE TABLE CART
 (
     UserID  NUMBER(4),
