@@ -13,93 +13,85 @@ public class UserPanel {
 //    private static
 
     public static void main(String[] args) throws SQLException, IOException, InterruptedException {
-
-        
-        Console console = System.console();
-        OracleConnection conn = null;
-        while (!(loginOracle)) { //Login Orcale
-
-            System.out.print("Enter your DBMS username: ");    // Your Oracle ID with double quote
-            String username = console.readLine();         // e.g. "98765432d"     String username = console.readLine();         // e.g. "98765432d"
-            System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
-
-            char[] password = console.readPassword();
-            String pwd = String.valueOf(password);
+//
+//
+//        Console console = System.console();
+//        OracleConnection conn = null;
+//        while (!(loginOracle)) { //Login Oracle
 //            try {
-                DriverManager.registerDriver(new OracleDriver());
-                conn = (OracleConnection) DriverManager.getConnection(
-                        "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms", username, pwd);
-                loginOracle = true;
+//            System.out.print("Enter your DBMS username: ");    // Your Oracle ID with double quote
+//            String username = console.readLine();         // e.g. "98765432d"     String username = console.readLine();         // e.g. "98765432d"
+//            System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
+//
+//            char[] password = console.readPassword();
+//            String pwd = String.valueOf(password);
+//                DriverManager.registerDriver(new OracleDriver());
+//                conn = (OracleConnection) DriverManager.getConnection(
+//                        "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms", username, pwd);
+//                loginOracle = true;
 //            } catch (Exception e) {
-//                System.out.println("login failed. Try again");
+//                System.out.println("Oracle login failed. Try again");
 //            }
-        }
-
-        conx = conn;
-        clearScreen();
-        System.out.println("Database Login successfully");
-        System.out.println(" ");
-
-        if (!(loginStatus)) { //Login user account (OSS)
-            System.out.println("Please login your account to continue - Metaverse Online Shopping System");
-            System.out.print("Input your username: ");
-            String InputUserName = console.readLine();
-//            String InputUserName = "Jones1";
-            System.out.print("Input your password: ");
-//            String InputUserPwd = "pass2";
-            String InputUserPwd = console.readLine();
-            loginStatus = loginCheck(InputUserName, InputUserPwd);
-            while (!(loginStatus)){
-                System.out.println("\nInvalid Username or password! Please Retry.");
-                System.out.print("Input your username: ");
-                InputUserName = console.readLine();
-//            String InputUserName = "Jones1";
-                System.out.print("Input your password: ");
-//            String InputUserPwd = "pass2";
-                InputUserPwd = console.readLine();
-                loginStatus = loginCheck(InputUserName, InputUserPwd);
-            }
-
-        }
-
-        clearScreen();
-        System.out.println("Login successfully! Metaverse Online Shopping System");
-        System.out.println(" ");
-
-
-        boolean inputJ = true;
-        while (inputJ) {
-            System.out.println("1. Search item");
-            System.out.println("2. Inspect shopping cart");
-            System.out.println("3. Check parcel status");
-            System.out.println("4. Account settings\n");
-            System.out.println("Enter -1 to exit\n");
-            System.out.print("Input the number option: ");
-            Scanner scanner = new Scanner(System.in);
-            int input = scanner.nextInt();
-            switch (input) {
-                case 1:
-                    searchItem();
-                    break;
-                case 2:
-                    ShoppingCart();
-                    break;
-                case 3:
-                    checkParcel();
-                    break;
-                case 4:
-                    accountManagement();
-                    break;
-                case 5:
-                case 6:
-                default:
-                    inputJ = false;
-                    System.out.println("Good Bye");
-                    conx.close();
-            }
-
-
-        }
+//        }
+//
+//        conx = conn;
+//        clearScreen();
+//        System.out.println("Database Login successfully");
+//        System.out.println(" ");
+//
+//        if (!(loginStatus)) { //Login user account (OSS)
+//            System.out.println("Please login your account to continue - Metaverse Online Shopping System");
+//            System.out.print("Input your username: ");
+//            String InputUserName = console.readLine();;
+//            System.out.print("Input your password: ");
+//            String InputUserPwd = console.readLine();
+//            loginStatus = loginCheck(InputUserName, InputUserPwd);
+//            while (!(loginStatus)){
+//                System.out.println("\nInvalid Username or password! Please Retry.");
+//                System.out.print("Input your username: ");
+//                InputUserName = console.readLine();
+//                System.out.print("Input your password: ");
+//                InputUserPwd = console.readLine();
+//                loginStatus = loginCheck(InputUserName, InputUserPwd);
+//            }
+//
+//        }
+//
+//        clearScreen();
+//        System.out.println("Login successfully! Metaverse Online Shopping System");
+//        System.out.println(" ");
+//
+//
+//        boolean inputJ = true;
+//        while (inputJ) {
+//            System.out.println("1. Search item");
+//            System.out.println("2. Inspect shopping cart");
+//            System.out.println("3. Check parcel status");
+//            System.out.println("4. Account settings\n");
+//            System.out.println("Enter -1 to exit\n");
+//            System.out.print("Input the number option: ");
+//            Scanner scanner = new Scanner(System.in);
+//            int input = scanner.nextInt();
+//            switch (input) {
+//                case 1:
+//                    searchItem();
+//                    break;
+//                case 2:
+//                    ShoppingCart();
+//                    break;
+//                case 3:
+//                    checkParcel();
+//                    break;
+//                case 4:
+//                    accountManagement();
+//                    break;
+//                default:
+//                    inputJ = false;
+//                    System.out.println("Good Bye");
+//                    conx.close();
+//                    break;
+//            }
+//        }
     }
 
     public static void searchItem() throws SQLException, IOException, InterruptedException {
@@ -125,8 +117,6 @@ public class UserPanel {
             case 4:
                 UserPanel.addProduct();
                 break;
-            case 5:
-            case 6:
             default:
                 break;
         }
@@ -155,6 +145,7 @@ public class UserPanel {
                 break;
             case 4:
                 checkoutCart();
+                break;
             default:
                 break;
         }
@@ -588,7 +579,7 @@ public class UserPanel {
         System.out.println("Product ID         Product Name      Product Price      Specification     Description");
         System.out.println("==============================================================================================");
         while (productList.next()) {
-            System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getInt(1), productList.getString(2),
+            System.out.printf("%-15s %-10s %-15s %-17s %-15s %n", productList.getInt(1), productList.getString(2),
                     productList.getInt(3), productList.getString(4),productList.getString(5));
         }
         st1.close();
