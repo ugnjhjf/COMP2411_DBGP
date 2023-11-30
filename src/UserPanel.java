@@ -585,7 +585,7 @@ public class UserPanel {
 //                Specification  VARCHAR(50),
 //                Description  VARCHAR(50),
 //                SellerID NUMBER(4),
-        System.out.printf("Product ID", "Product Name", "Product Price", "Specification","Description");
+        System.out.println("Product ID         Product Name      Product Price      Specification     Description");
         System.out.println("==============================================================================================");
         while (productList.next()) {
             System.out.printf("%-15s %-10s %-15s %-17s%n", productList.getInt(1), productList.getString(2),
