@@ -10,74 +10,74 @@ public class AdminPanel {
     private static OracleConnection conx;
 
     public static void main(String[] args) throws SQLException, IOException, InterruptedException {
-
-        Console console = System.console();
-        System.out.print("Enter your DBMS username: ");    // Your Oracle ID with double quote
-        String username = console.readLine();         // e.g. "98765432d"
-        System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
-        char[] password = console.readPassword();
-        String pwd = String.valueOf(password);
-        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-        OracleConnection conn =
-                (OracleConnection)DriverManager.getConnection(
-                        "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms",username,pwd);
-        conx = conn;
-
-        boolean inputStatus = true;
-        while(inputStatus) {
-            System.out.println("\nEntered admin panel");
-            System.out.println();
-            System.out.println("1. Add a single product");
-            System.out.println("2. Delete a product by ProductID");
-
-            System.out.println("3. Show ALL products");
-
-            //under amending
-            System.out.println("4. Show details of one product by ProductID");
-            //under amending
-            System.out.println("5. Check the details of a parcel by ParcelID");
-            //under construction
-            System.out.println("6. Analyze");
-
-            //Completed
-            System.out.println("7. Manually add new user");
-
-            System.out.println("\nEnter -1 to exit\n");
-            System.out.print("Please enter the number option: ");
-
-            String option = console.readLine();
-            switch (option)
-            {
-                case "1":
-                    addItem();
-                    break;
-                case "2":
-                    deleteItem();
-                    break;
-                case "3":
-                    showAllItem();
-                    break;
-                case "4":
-                    searchByID();
-                    break;
-                case "5":
-                    showAParcel();
-                    break;
-                case "6"://待完善确认
-                    analyzeSales();
-                    break;
-                case "7":
-                    addUser();
-                    break;
-                case "-1":
-                    System.out.println("Exiting admin panel...");
-                    System.exit(1);
-                    break;
-                default:
-                    inputStatus=false;
-                    break;
-            }
-        }
+//
+//        Console console = System.console();
+//        System.out.print("Enter your DBMS username: ");    // Your Oracle ID with double quote
+//        String username = console.readLine();         // e.g. "98765432d"
+//        System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
+//        char[] password = console.readPassword();
+//        String pwd = String.valueOf(password);
+//        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+//        OracleConnection conn =
+//                (OracleConnection)DriverManager.getConnection(
+//                        "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms",username,pwd);
+//        conx = conn;
+//
+//        boolean inputStatus = true;
+//        while(inputStatus) {
+//            System.out.println("\nEntered admin panel");
+//            System.out.println();
+//            System.out.println("1. Add a single product");
+//            System.out.println("2. Delete a product by ProductID");
+//
+//            System.out.println("3. Show ALL products");
+//
+//            //under amending
+//            System.out.println("4. Show details of one product by ProductID");
+//            //under amending
+//            System.out.println("5. Check the details of a parcel by ParcelID");
+//            //under construction
+//            System.out.println("6. Analyze");
+//
+//            //Completed
+//            System.out.println("7. Manually add new user");
+//
+//            System.out.println("\nEnter -1 to exit\n");
+//            System.out.print("Please enter the number option: ");
+//
+//            String option = console.readLine();
+//            switch (option)
+//            {
+//                case "1":
+//                    addItem();
+//                    break;
+//                case "2":
+//                    deleteItem();
+//                    break;
+//                case "3":
+//                    showAllItem();
+//                    break;
+//                case "4":
+//                    searchByID();
+//                    break;
+//                case "5":
+//                    showAParcel();
+//                    break;
+//                case "6"://待完善确认
+//                    analyzeSales();
+//                    break;
+//                case "7":
+//                    addUser();
+//                    break;
+//                case "-1":
+//                    System.out.println("Exiting admin panel...");
+//                    System.exit(1);
+//                    break;
+//                default:
+//                    inputStatus=false;
+//                    break;
+//            }
+//        }
     }
     static void clearScreen() throws IOException, InterruptedException
     {
@@ -257,7 +257,7 @@ public class AdminPanel {
                 }else{
                     System.out.println("Invalid input! ProductID must be a numeric value smaller than 1000.");
                 }
-            } catch (NumberFormatException e) {
+            } catch (Exception e) {
                 System.out.println("Invalid input! ProductID must be a numeric value smaller than 1000.");
             }
         }
@@ -452,13 +452,20 @@ public class AdminPanel {
         String userName = console.readLine();
         System.out.print("Enter password: ");
         String passWord = console.readLine();
+        System.out.print("Enter Telephone: ");
+        String telphone = console.readLine();
+        System.out.print("Enter Shipping address: ");
+        String address = console.readLine();
 
-        String insertQuery = "INSERT INTO CUSTOMER (UserID, Username, Password) VALUES (?, ?, ?)";
+
+        String insertQuery = "INSERT INTO CUSTOMER (UserID, Username, Password,Tel,Shipping address) VALUES (?, ?, ?, ?, ?)";
 
         PreparedStatement preparedStatement = conx.prepareStatement(insertQuery);
         preparedStatement.setInt(1, userID);
         preparedStatement.setString(2, userName);
         preparedStatement.setString(3, passWord);
+        preparedStatement.setString(4, telphone);
+        preparedStatement.setString(3, address);
 
         preparedStatement.executeUpdate();
         preparedStatement.close();
@@ -514,6 +521,84 @@ public class AdminPanel {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+    public static void Admin() throws SQLException,IOException,InterruptedException{
+        Console console = System.console();
+        System.out.print("Enter your DBMS username: ");    // Your Oracle ID with double quote
+        String username = console.readLine();         // e.g. "98765432d"
+        System.out.print("Enter your DBMS password: ");    // Password of your Oracle Account
+        char[] password = console.readPassword();
+        String pwd = String.valueOf(password);
+        try {
+            DriverManager.registerDriver(new OracleDriver());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        OracleConnection conn =
+                null;
+        try {
+            conn = (OracleConnection) DriverManager.getConnection(
+                    "jdbc:oracle:thin:@studora.comp.polyu.edu.hk:1521:dbms",username,pwd);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        conx = conn;
+
+        boolean inputStatus = true;
+        while(inputStatus) {
+            System.out.println("\nEntered admin panel");
+            System.out.println();
+            System.out.println("1. Add a single product");
+            System.out.println("2. Delete a product by ProductID");
+
+            System.out.println("3. Show ALL products");
+
+            //under amending
+            System.out.println("4. Show details of one product by ProductID");
+            //under amending
+            System.out.println("5. Check the details of a parcel by ParcelID");
+            //under construction
+            System.out.println("6. Analyze");
+
+            //Completed
+            System.out.println("7. Manually add new user");
+
+            System.out.println("\nEnter -1 to exit\n");
+            System.out.print("Please enter the number option: ");
+
+            String option = console.readLine();
+            switch (option)
+            {
+                case "1":
+                    addItem();
+                    break;
+                case "2":
+                    deleteItem();
+                    break;
+                case "3":
+                    showAllItem();
+                    break;
+                case "4":
+                    searchByID();
+                    break;
+                case "5":
+                    showAParcel();
+                    break;
+                case "6"://待完善确认
+                    analyzeSales();
+                    break;
+                case "7":
+                    addUser();
+                    break;
+                case "-1":
+                    System.out.println("Exiting admin panel...");
+                    System.exit(1);
+                    break;
+                default:
+                    inputStatus=false;
+                    break;
+            }
         }
     }
 }
