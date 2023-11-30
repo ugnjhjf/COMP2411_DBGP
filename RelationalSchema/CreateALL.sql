@@ -1,7 +1,7 @@
 CREATE TABLE SELLER
 (
     SellerID NUMBER(4) PRIMARY KEY,
-    SellerName VARCHAR(10)
+    SellerName VARCHAR(30)
 );
 INSERT INTO SELLER (SellerID, SellerName) VALUES (3001, 'Amiami');
 INSERT INTO SELLER (SellerID, SellerName) VALUES (3002, 'Dasiny');
@@ -40,7 +40,7 @@ CREATE TABLE PRODUCT
             REFERENCES SELLER(SellerID)
 );
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0001,'RPG 7',1500,'red','a powerful weapon',3004,10);
-INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0002,'Happy Potion',66,'colorful','let you dive into tRAnCe');
+INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0002,'Happy Potion',66,'colorful','let you dive into tRAnCe',3001,90);
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0003,'pencil',10,'blue','made in china',3002,500);
 INSERT INTO PRODUCT (ProductID, ProductName, Price, Specification, Description, SellerID, Quantity) VALUES (0004,'Vanilla',9999,'La Soleil','',3009,500);
 CREATE TABLE CART
@@ -59,7 +59,7 @@ CREATE TABLE PARCEL
     Quantity NUMBER(4),
     UserID NUMBER(4) NOT NULL,
     Shipping_address VARCHAR(100),
-    Status VACHAR(20) default 'Preparing',
+    Status VARCHAR(20) default 'Preparing',
     CONSTRAINT FK_PARCEL_PRODUCT FOREIGN KEY (ProductID) REFERENCES PRODUCT(ProductID),
     CONSTRAINT FK_PARCEL_CUSTOMER FOREIGN KEY (UserID) REFERENCES CUSTOMER(UserID)
 );
