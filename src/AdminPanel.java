@@ -91,11 +91,6 @@ public class AdminPanel {
         Console console = System.console();
 
         System.out.print("Enter ProductID (4 numbers only, begin with 0XXX): ");
-        try{
-            int productID = Integer.parseInt(console.readLine());
-        }catch (Exception e){
-            System.out.println("Invalid ProductID input, input again!");
-        }
         int productID = Integer.parseInt(console.readLine());
         System.out.print("Enter ProductName: ");
         String productName = console.readLine();
@@ -242,7 +237,8 @@ public class AdminPanel {
         preparedStatement.close();
         System.out.println("User Added!");
     }
-    private static void analyzeSales() {
+    private static void analyzeSales() throws IOException, InterruptedException {
+        clearScreen();
         try {
             // 查询售出物品的数量
             String quantityQuery = "SELECT SUM(Quantity) AS TotalQuantity FROM PARCEL";
